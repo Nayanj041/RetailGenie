@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 
-from controllers.ai_engine import AIEngine
-from utils.firebase_utils import FirebaseUtils
+from app.controllers.ai_engine import AIEngine
+from app.utils.firebase_utils import FirebaseUtils
 
 logger = logging.getLogger(__name__)
 

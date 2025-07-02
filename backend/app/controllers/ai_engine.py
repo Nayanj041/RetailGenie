@@ -1,12 +1,13 @@
 import json
 import logging
+import os
 import re
 import warnings
 from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
 import numpy as np
-import openai
+import google.generativeai as genai
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -19,10 +20,25 @@ logger = logging.getLogger(__name__)
 class AIEngine:
     def __init__(self):
         """Initialize the AI Engine with enhanced capabilities"""
-        # Note: API key should be set in environment variables
-        # openai.api_key = os.getenv('OPENAI_API_KEY')
+        # Initialize Google Gemini with error handling
+        self.gemini_model = None
+        self._initialize_gemini()
+        
+    def _initialize_gemini(self):
+        """Initialize Gemini with proper error handling"""
+        try:
+            gemini_api_key = os.getenv("GEMINI_API_KEY")
+            if gemini_api_key:
+                genai.configure(api_key=gemini_api_key)
+                self.gemini_model = genai.GenerativeModel(os.getenv("GEMINI_MODEL", "gemini-pro"))
+                logger.info("AI Engine: Gemini initialized successfully")
+            else:
+                logger.warning("AI Engine: Gemini API key not found")
+        except Exception as e:
+            logger.warning(f"AI Engine: Failed to initialize Gemini: {str(e)}")
+            self.gemini_model = None
+            
         self.tfidf_vectorizer = TfidfVectorizer(max_features=1000, stop_words="english")
-        pass
 
     def forecast_demand(
         self, historical_data: List[float], days_ahead: int = 30
@@ -290,7 +306,7 @@ class AIEngine:
             str: AI response
         """
         try:
-            # This would use OpenAI GPT API in production
+            # This would use Google Gemini API in production
             # For now, using rule-based responses
 
             message_lower = message.lower()

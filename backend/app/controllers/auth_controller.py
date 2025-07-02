@@ -6,7 +6,7 @@ import bcrypt
 import jwt
 
 from models.user_model import User
-from utils.firebase_utils import FirebaseUtils
+from app.utils.firebase_utils import FirebaseUtils
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class AuthController:
     def __init__(self):
         self.firebase = FirebaseUtils()
         self.collection_name = "users"
-        self.secret_key = os.getenv("JWT_SECRET_KEY", "your-secret-key-here")
+        self.secret_key = os.getenv("JWT_SECRET", "your-secret-key-here")
 
     def register_user(self, user_data):
         """
@@ -33,28 +33,31 @@ class AuthController:
             name = user_data.get("name")
 
             # Check if user already exists
-            existing_user = self.firebase.get_documents(
-                self.collection_name, {"email": email}
+            existing_users = self.firebase.query_documents(
+                self.collection_name, "email", "==", email
             )
 
-            if existing_user:
+            if existing_users:
                 raise ValueError("User with this email already exists")
 
-            # Create user model
-            user = User(email=email, name=name, password=password)
-
             # Hash password
-            user.password = self._hash_password(password)
+            hashed_password = self._hash_password(password)
 
+            # Create user data
+            user_dict = {
+                "email": email,
+                "name": name,
+                "password": hashed_password,
+                "role": "user",
+                "is_active": True,
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
+            }
             # Save to Firebase
-            user_dict = user.to_dict()
-            user_dict["created_at"] = datetime.now().isoformat()
-            user_dict["is_active"] = True
-
             user_id = self.firebase.create_document(self.collection_name, user_dict)
 
             # Generate JWT token
-            token = self._generate_token(user_id, email)
+            token = self._generate_token(user_id, email, user_dict.get("role", "user"))
 
             # Remove password from response
             user_dict.pop("password", None)
@@ -78,7 +81,7 @@ class AuthController:
         """
         try:
             # Find user by email
-            users = self.firebase.get_documents(self.collection_name, {"email": email})
+            users = self.firebase.query_documents(self.collection_name, "email", "==", email)
 
             if not users:
                 raise ValueError("Invalid email or password")
@@ -92,6 +95,24 @@ class AuthController:
             # Check if user is active
             if not user_data.get("is_active", True):
                 raise ValueError("Account is deactivated")
+
+            # Generate JWT token
+            token = self._generate_token(user_data.get("id"), email, user_data.get("role", "user"))
+
+            # Remove password from response
+            user_data.pop("password", None)
+
+            # Update last login
+            self.firebase.update_document(
+                self.collection_name, 
+                user_data.get("id"), 
+                {"last_login": datetime.utcnow().isoformat()}
+            )
+
+            return {"user": user_data, "token": token}
+        except Exception as e:
+            logger.error(f"Error logging in user: {str(e)}")
+            raise
 
             # Generate JWT token
             token = self._generate_token(user_data["id"], email)
@@ -258,12 +279,13 @@ class AuthController:
         except Exception:
             return False
 
-    def _generate_token(self, user_id, email):
+    def _generate_token(self, user_id, email, role="user"):
         """Generate JWT token"""
         try:
             payload = {
                 "user_id": user_id,
                 "email": email,
+                "role": role,
                 "exp": datetime.utcnow() + timedelta(days=7),  # Token expires in 7 days
                 "iat": datetime.utcnow(),
             }

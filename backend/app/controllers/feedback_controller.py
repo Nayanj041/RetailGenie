@@ -1,10 +1,10 @@
 import logging
 from datetime import datetime
 
-from controllers.ai_engine import AIEngine
-from utils.email_utils import EmailUtils
-from utils.firebase_utils import FirebaseUtils
-from utils.pdf_utils import PDFUtils
+from app.controllers.ai_engine import AIEngine
+from app.utils.email_utils import EmailUtils
+from app.utils.firebase_utils import FirebaseUtils
+from app.utils.pdf_utils import PDFUtils
 
 logger = logging.getLogger(__name__)
 

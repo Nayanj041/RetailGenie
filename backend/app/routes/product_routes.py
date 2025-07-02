@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from controllers.product_controller import ProductController
+from app.controllers.product_controller import ProductController
 
 product_bp = Blueprint("products", __name__)
 product_controller = ProductController()

@@ -161,3 +161,10 @@ advanced_features_test_results.json
 # Local configuration files
 config_local.py
 .env.local
+.env.production
+.env.backup
+.env.clean
+
+# Firebase credentials (security sensitive)
+*firebase*adminsdk*.json
+retailgenie-*-firebase-adminsdk-*.json

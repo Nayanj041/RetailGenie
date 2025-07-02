@@ -1038,7 +1038,7 @@ def create_app():
 
             context = data.get("context", {})
 
-            # Simple AI response logic (in production, integrate with OpenAI/Claude)
+            # Simple AI response logic (in production, integrate with Google Gemini)
             response_text = f"Thank you for your question: '{message}'. "
 
             if "headphones" in message.lower():
