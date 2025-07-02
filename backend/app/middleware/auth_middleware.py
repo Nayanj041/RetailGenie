@@ -22,7 +22,7 @@ class AuthMiddleware:
     def __init__(self, app=None):
         self.app = app
         self.firebase = FirebaseUtils()
-        self.jwt_secret = os.getenv("JWT_SECRET", "your-secret-key")
+        self.jwt_secret = os.getenv("JWT_SECRET_KEY", "jwt-secret-key-change-in-production")
         if app is not None:
             self.init_app(app)
     

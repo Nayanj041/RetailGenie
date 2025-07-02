@@ -139,7 +139,7 @@ def create_app(config_class=Config):
         from datetime import datetime, timedelta
         
         try:
-            secret_key = app.config.get('JWT_SECRET', 'dev-jwt-secret')
+            secret_key = app.config.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
             
             # Create test user payload
             payload = {
