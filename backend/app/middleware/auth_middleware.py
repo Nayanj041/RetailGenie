@@ -11,7 +11,7 @@ from functools import wraps
 
 import jwt
 from flask import jsonify, request, current_app
-from utils.firebase_utils import FirebaseUtils
+from app.utils.firebase_utils import FirebaseUtils
 
 logger = logging.getLogger(__name__)
 
