@@ -41,6 +41,7 @@ class AuthMiddleware:
                 'root',
                 'api_info',
                 'list_all_routes',
+                'get_test_token',
                 'auth_bp.login',
                 'auth_bp.register',
                 'auth_bp.forgot_password'
@@ -52,6 +53,7 @@ class AuthMiddleware:
                 '/status',
                 '/api/v1/health',
                 '/api/v1/routes',
+                '/api/v1/auth/test-token',
                 '/api/v1/auth/login',
                 '/api/v1/auth/register',
                 '/api/auth/login',
