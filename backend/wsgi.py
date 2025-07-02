@@ -19,7 +19,7 @@ import logging
 from datetime import datetime
 
 # Import configuration
-from config.config import Config
+from backend.config.config import Config
 
 # Import routes
 from app.routes.auth_routes import auth_bp
