@@ -1,0 +1,95 @@
+# Production Requirements for RetailGenie Backend
+# Essential packages only for deployment
+
+# Core Authentication & Security
+bcrypt==4.2.1
+
+# Web Framework
+Flask==3.1.1
+flask-cors==6.0.1
+Werkzeug==3.1.3
+
+# Environment and Configuration
+python-dotenv==1.1.1
+
+# Authentication
+PyJWT==2.10.1
+
+# Data Processing (Essential)
+pandas==2.2.3
+numpy==2.2.6
+
+# Google AI and Firebase
+google-generativeai==0.8.5
+firebase-admin==6.9.0
+google-api-core==2.25.1
+google-auth==2.40.3
+google-cloud-core==2.4.3
+google-cloud-firestore==2.21.0
+google-cloud-storage==3.1.1
+
+# Machine Learning (Essential)
+scikit-learn==1.6.1
+
+# HTTP and Networking
+requests==2.32.4
+urllib3==2.5.0
+
+# JSON and Data Handling
+jsonschema==4.24.0
+
+# Date and Time
+python-dateutil==2.9.0.post0
+
+# Async Support
+anyio==4.9.0
+
+# Security
+cryptography==45.0.4
+
+# Utilities
+click==8.2.1
+blinker==1.9.0
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.2
+
+# Production Server
+gunicorn==23.0.0
+
+# Caching (Optional but useful)
+redis==6.2.0
+
+# Google Dependencies
+google-api-python-client==2.174.0
+google-auth-httplib2==0.2.0
+google-crc32c==1.7.1
+google-resumable-media==2.7.2
+googleapis-common-protos==1.70.0
+grpcio==1.73.1
+grpcio-status==1.71.2
+
+# Protocol Buffers
+protobuf==5.29.5
+proto-plus==1.26.1
+
+# Async Libraries
+httpcore==1.0.9
+httpx==0.28.1
+h11==0.16.0
+
+# Additional Dependencies
+certifi==2025.6.15
+charset-normalizer==3.4.2
+idna==3.10
+setuptools==80.9.0
+six==1.17.0
+typing_extensions==4.14.0
+tzdata==2025.2
+
+# Pydantic for data validation
+pydantic==2.11.7
+pydantic_core==2.33.2
+
+# Development Tools (minimal)
+PyYAML==6.0.2
