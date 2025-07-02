@@ -130,5 +130,8 @@ def main():
         threaded=True
     )
 
+# Create app instance for WSGI servers (like Gunicorn)
+app = create_app()
+
 if __name__ == '__main__':
     main()
