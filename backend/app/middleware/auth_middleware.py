@@ -3,16 +3,26 @@ Authentication Middleware
 Perfect Structure Implementation
 """
 
+import functools
+import logging
+import os
+from datetime import datetime, timedelta
 from functools import wraps
-from flask import request, jsonify, current_app
+
 import jwt
-from datetime import datetime
+from flask import jsonify, request, current_app
+from utils.firebase_utils import FirebaseUtils
+
+logger = logging.getLogger(__name__)
+
 
 class AuthMiddleware:
     """Authentication middleware for JWT token validation"""
     
     def __init__(self, app=None):
         self.app = app
+        self.firebase = FirebaseUtils()
+        self.jwt_secret = os.getenv("JWT_SECRET", "your-secret-key")
         if app is not None:
             self.init_app(app)
     

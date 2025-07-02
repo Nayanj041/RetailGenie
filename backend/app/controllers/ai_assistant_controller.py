@@ -1,13 +1,14 @@
 import json
 import logging
+import os
 from datetime import datetime
 
-import openai
+import google.generativeai as genai
 import speech_recognition as sr
 
-from controllers.ai_engine import AIEngine
-from utils.email_utils import EmailUtils
-from utils.firebase_utils import FirebaseUtils
+from app.controllers.ai_engine import AIEngine
+from app.utils.email_utils import EmailUtils
+from app.utils.firebase_utils import FirebaseUtils
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,26 @@ class AIAssistantController:
         self.chat_collection = "chat_history"
         self.products_collection = "products"
         self.coupons_collection = "coupons"
+        
+        # Initialize Google Gemini with error handling
+        self.gemini_model = None
+        self._initialize_gemini()
+        
+    def _initialize_gemini(self):
+        """Initialize Gemini with proper error handling"""
+        try:
+            gemini_api_key = os.getenv("GEMINI_API_KEY")
+            if gemini_api_key:
+                genai.configure(api_key=gemini_api_key)
+                self.gemini_model = genai.GenerativeModel(os.getenv("GEMINI_MODEL", "gemini-pro"))
+                logger.info("Gemini AI initialized successfully")
+            else:
+                logger.warning("Gemini API key not found - AI features will be limited")
+        except Exception as e:
+            logger.warning(f"Failed to initialize Gemini AI: {str(e)} - AI features will be limited")
+            self.gemini_model = None
+            self.gemini_model = None
+            logger.warning("Gemini API key not configured")
 
     def process_chat_message(self, message, user_id, context=None):
         """
@@ -314,25 +335,102 @@ class AIAssistantController:
     def _handle_product_search(self, message, user_id, context):
         """Handle product search requests"""
         try:
-            # Extract search terms
-            search_terms = self._extract_search_terms(message)
+            # Extract search terms (enhanced with Gemini if available)
+            search_terms = self._extract_search_terms_with_ai(message)
 
-            # Search products
-            products = self.ai_engine.search_products(search_terms, [])
+            # Get all products from Firebase
+            all_products = self.firebase.get_documents(self.products_collection)
+
+            # Search products using AI engine
+            products = self.ai_engine.search_products(search_terms, all_products)
+
+            # Generate AI-powered response
+            if len(products) > 0:
+                response_text = f"I found {len(products)} products that match your search"
+                if self.gemini_model:
+                    # Use Gemini to generate a more natural response
+                    ai_response = self._generate_search_response(message, products[:3])
+                    if ai_response:
+                        response_text = ai_response
+            else:
+                response_text = "I couldn't find any products matching your search. Let me suggest some alternatives."
+                # Could add alternative suggestions here
 
             return {
-                "text": f"I found {len(products)} products matching your search. Here are the top results:",
+                "text": response_text,
                 "intent": "product_search",
                 "products": products[:5],
                 "actions": ["show_products"],
                 "search_terms": search_terms,
+                "total_found": len(products)
             }
         except Exception as e:
+            logger.error(f"Error in product search: {str(e)}")
             return {
                 "text": "I'm having trouble searching for products right now. Please try again.",
                 "intent": "error",
                 "actions": [],
             }
+
+    def _extract_search_terms_with_ai(self, message):
+        """Extract search terms using AI for better understanding"""
+        try:
+            if self.gemini_model:
+                # Use Gemini to extract key product-related terms
+                prompt = f"""Extract the key product search terms from this message: "{message}"
+                Return only the essential product keywords, separated by spaces.
+                Focus on product names, categories, brands, or features.
+                
+                Example:
+                Message: "I'm looking for wireless headphones for gaming"
+                Keywords: wireless headphones gaming
+                
+                Message: {message}
+                Keywords:"""
+                
+                response = self.gemini_model.generate_content(prompt)
+                
+                extracted_terms = response.text.strip()
+                if extracted_terms and len(extracted_terms) > 0:
+                    return extracted_terms
+            
+            # Fallback to simple extraction
+            return self._extract_search_terms(message)
+            
+        except Exception as e:
+            logger.error(f"Error extracting search terms with AI: {str(e)}")
+            return self._extract_search_terms(message)
+
+    def _generate_search_response(self, original_message, products):
+        """Generate natural response using Gemini for search results"""
+        try:
+            if not self.gemini_model or not products:
+                return None
+                
+            product_descriptions = []
+            for product in products:
+                desc = f"{product.get('name', 'Unknown')} (${product.get('price', 0)}) - {product.get('category', 'General')}"
+                product_descriptions.append(desc)
+            
+            prompt = f"""The user asked: "{original_message}"
+            I found these products: {'; '.join(product_descriptions)}
+            
+            Write a helpful, conversational response (max 100 words) that:
+            1. Acknowledges their request
+            2. Mentions the products found
+            3. Offers to help further
+            
+            Keep it natural and friendly.
+            
+            Response:"""
+            
+            response = self.gemini_model.generate_content(prompt)
+            
+            return response.text.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating AI search response: {str(e)}")
+            return None
 
     def _handle_substitute_request(self, message, user_id, context):
         """Handle product substitute requests"""
@@ -368,18 +466,49 @@ class AIAssistantController:
         }
 
     def _handle_general_inquiry(self, message, user_id, context):
-        """Handle general inquiries"""
+        """Handle general inquiries using Google Gemini"""
         try:
-            # Use GPT for general conversation
-            response = self.ai_engine.generate_general_response(message)
-
-            return {"text": response, "intent": "general_inquiry", "actions": []}
-        except:
+            # If Gemini API key is configured, use Gemini
+            if self.gemini_model:
+                response = self._get_gemini_response(message, context)
+                return {"text": response, "intent": "general_inquiry", "actions": []}
+            else:
+                # Fallback to rule-based response
+                response = self.ai_engine.generate_general_response(message)
+                return {"text": response, "intent": "general_inquiry", "actions": []}
+        except Exception as e:
+            logger.error(f"Error in general inquiry: {str(e)}")
             return {
                 "text": "I'm here to help with your shopping needs. How can I assist you?",
                 "intent": "general_inquiry",
                 "actions": [],
             }
+
+    def _get_gemini_response(self, message, context=None):
+        """Get response from Google Gemini"""
+        try:
+            # Build conversation context
+            system_prompt = """You are a helpful AI shopping assistant for RetailGenie, 
+            an e-commerce platform. You help customers find products, answer questions about 
+            pricing, suggest alternatives, and provide shopping advice. Keep responses 
+            conversational, helpful, and focused on retail/shopping topics. Limit responses to 150 words."""
+            
+            # Combine system prompt with user message
+            full_prompt = f"{system_prompt}\n\nUser: {message}\n\nAssistant:"
+            
+            # Add context if provided
+            if context and context.get("recent_searches"):
+                context_info = f"User has recently searched for: {', '.join(context['recent_searches'])}\n"
+                full_prompt = f"{system_prompt}\n\n{context_info}User: {message}\n\nAssistant:"
+            
+            response = self.gemini_model.generate_content(full_prompt)
+            
+            return response.text.strip()
+            
+        except Exception as e:
+            logger.error(f"Gemini API error: {str(e)}")
+            # Fallback to rule-based response
+            return self.ai_engine.generate_general_response(message)
 
     def _save_chat_interaction(self, user_id, message, response):
         """Save chat interaction to database"""

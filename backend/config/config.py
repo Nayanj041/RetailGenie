@@ -42,8 +42,9 @@ class Config:
     SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD")
     ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@retailgenie.com")
 
-    # OpenAI Configuration
-    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+    # Google Gemini Configuration
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+    GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-pro")
 
     # File Upload Configuration
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
@@ -166,7 +167,7 @@ Email Configuration:
 - ADMIN_EMAIL: Admin email for notifications
 
 AI Configuration:
-- OPENAI_API_KEY: OpenAI API key for AI features
+- GEMINI_API_KEY: Google Gemini API key for AI features
 
 Optional Configuration:
 - CORS_ORIGINS: Comma-separated list of allowed origins
@@ -188,7 +189,7 @@ SENDER_EMAIL=your-email@gmail.com
 SENDER_PASSWORD=your-app-password
 ADMIN_EMAIL=admin@yourcompany.com
 
-OPENAI_API_KEY=your-openai-api-key
+GEMINI_API_KEY=your-gemini-api-key
 
 CORS_ORIGINS=http://localhost:3000,https://yourfrontend.com
 """

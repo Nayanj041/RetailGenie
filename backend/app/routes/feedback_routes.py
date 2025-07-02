@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from controllers.feedback_controller import FeedbackController
+from app.controllers.feedback_controller import FeedbackController
 
 feedback_bp = Blueprint("feedback", __name__)
 feedback_controller = FeedbackController()

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from controllers.analytics_controller import AnalyticsController
+from app.controllers.analytics_controller import AnalyticsController
 
 analytics_bp = Blueprint("analytics", __name__)
 analytics_controller = AnalyticsController()
