@@ -21,19 +21,44 @@ class FirebaseUtils:
             if not firebase_admin._apps:
                 # Initialize Firebase
                 cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
-
+                
                 if cred_path and os.path.exists(cred_path):
                     # Use service account key file
                     cred = credentials.Certificate(cred_path)
                     firebase_admin.initialize_app(cred)
+                    logger.info("Firebase initialized with service account file")
+                elif os.getenv("FIREBASE_PROJECT_ID"):
+                    # Use environment variables to create credentials
+                    firebase_config = {
+                        "type": "service_account",
+                        "project_id": os.getenv("FIREBASE_PROJECT_ID"),
+                        "private_key_id": os.getenv("FIREBASE_PRIVATE_KEY_ID"),
+                        "private_key": os.getenv("FIREBASE_PRIVATE_KEY", "").replace("\\n", "\n"),
+                        "client_email": os.getenv("FIREBASE_CLIENT_EMAIL"),
+                        "client_id": os.getenv("FIREBASE_CLIENT_ID"),
+                        "auth_uri": os.getenv("FIREBASE_AUTH_URI", "https://accounts.google.com/o/oauth2/auth"),
+                        "token_uri": os.getenv("FIREBASE_TOKEN_URI", "https://oauth2.googleapis.com/token"),
+                        "auth_provider_x509_cert_url": os.getenv("FIREBASE_AUTH_PROVIDER_CERT_URL", "https://www.googleapis.com/oauth2/v1/certs"),
+                        "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_CERT_URL")
+                    }
+                    
+                    # Filter out None values
+                    firebase_config = {k: v for k, v in firebase_config.items() if v is not None}
+                    
+                    if len(firebase_config) >= 4:  # Minimum required fields
+                        cred = credentials.Certificate(firebase_config)
+                        firebase_admin.initialize_app(cred)
+                        logger.info("Firebase initialized with environment variables")
+                    else:
+                        raise ValueError("Insufficient Firebase configuration in environment variables")
                 else:
-                    # Use default credentials (for Google Cloud environment)
+                    # Try default credentials (for Google Cloud environment)
                     firebase_admin.initialize_app()
-
-                logger.info("Firebase initialized successfully")
+                    logger.info("Firebase initialized with default credentials")
 
             # Get Firestore client
             self.db = firestore.client()
+            logger.info("Firestore client created successfully")
 
         except Exception as e:
             logger.error(f"Failed to initialize Firebase: {str(e)}")

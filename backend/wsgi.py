@@ -8,10 +8,9 @@ import os
 import sys
 from pathlib import Path
 
-# Add the app directory to Python path
+# Add the backend directory to Python path
 current_dir = Path(__file__).parent
-app_dir = current_dir / "app"
-sys.path.insert(0, str(app_dir))
+sys.path.insert(0, str(current_dir))
 
 from flask import Flask
 from flask_cors import CORS

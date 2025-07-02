@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import bcrypt
 import jwt
 
-from models.user_model import User
+from app.models.user_model import User
 from app.utils.firebase_utils import FirebaseUtils
 
 logger = logging.getLogger(__name__)
