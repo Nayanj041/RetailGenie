@@ -37,7 +37,6 @@ class AuthMiddleware:
             exempt_endpoints = [
                 'health_check',
                 'simple_status',
-                'api_info',
                 'root',
                 'get_routes',
                 'list_all_routes',
@@ -48,9 +47,12 @@ class AuthMiddleware:
             
             # Also skip auth for specific paths
             exempt_paths = [
+                '/',
                 '/status',
                 '/api/v1/health',
                 '/api/v1/routes',
+                '/api/v1/auth/login',
+                '/api/v1/auth/register',
                 '/api/auth/login',
                 '/api/auth/register',
                 '/api/auth/forgot-password'
