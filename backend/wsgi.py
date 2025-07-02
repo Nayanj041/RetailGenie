@@ -19,21 +19,21 @@ import logging
 from datetime import datetime
 
 # Import configuration
-from config.config import Config
+from backend.config.config import Config
 
 # Import routes
-from app.routes.auth_routes import auth_bp
-from app.routes.product_routes import product_bp
-from app.routes.inventory_routes import inventory_bp
-from app.routes.analytics_routes import analytics_bp
-from app.routes.ai_assistant_routes import ai_assistant_bp
-from app.routes.feedback_routes import feedback_bp
-from app.routes.pricing_routes import pricing_bp
+from backend.app.routes.auth_routes import auth_bp
+from backend.app.routes.product_routes import product_bp
+from backend.app.routes.inventory_routes import inventory_bp
+from backend.app.routes.analytics_routes import analytics_bp
+from backend.app.routes.ai_assistant_routes import ai_assistant_bp
+from backend.app.routes.feedback_routes import feedback_bp
+from backend.app.routes.pricing_routes import pricing_bp
 
 # Import middleware
-from app.middleware.auth_middleware import AuthMiddleware
-from app.middleware.cors_middleware import setup_cors
-from app.middleware.logging_middleware import setup_logging
+from backend.app.middleware.auth_middleware import AuthMiddleware
+from backend.app.middleware.cors_middleware import setup_cors
+from backend.app.middleware.logging_middleware import setup_logging
 
 def create_app(config_class=Config):
     """Application factory pattern"""
