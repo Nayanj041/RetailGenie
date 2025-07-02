@@ -36,9 +36,10 @@ class AuthMiddleware:
             # Skip auth for certain endpoints
             exempt_endpoints = [
                 'health_check',
+                'api_health_check',
                 'simple_status',
                 'root',
-                'get_routes',
+                'api_info',
                 'list_all_routes',
                 'auth_bp.login',
                 'auth_bp.register',

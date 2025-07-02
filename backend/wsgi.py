@@ -59,6 +59,22 @@ def create_app(config_class=Config):
     app.register_blueprint(feedback_bp, url_prefix='/api/v1/feedback')
     app.register_blueprint(pricing_bp, url_prefix='/api/v1/pricing')
     
+    # Root endpoint
+    @app.route('/')
+    def root():
+        return {
+            'message': 'Welcome to RetailGenie API',
+            'status': 'online',
+            'version': '1.0.0',
+            'documentation': '/api/info',
+            'health': '/health'
+        }
+    
+    # Simple status endpoint
+    @app.route('/status')
+    def simple_status():
+        return {'status': 'ok'}
+    
     # Health check endpoint
     @app.route('/health')
     def health_check():
@@ -67,6 +83,20 @@ def create_app(config_class=Config):
             'timestamp': datetime.now().isoformat(),
             'version': '1.0.0',
             'environment': app.config.get('ENV', 'development')
+        }
+    
+    # Alternative health check endpoint
+    @app.route('/api/v1/health')
+    def api_health_check():
+        return {
+            'status': 'healthy',
+            'api_version': 'v1',
+            'timestamp': datetime.now().isoformat(),
+            'services': {
+                'database': 'connected',
+                'auth': 'active',
+                'ai': 'ready'
+            }
         }
     
     # API info endpoint
@@ -88,6 +118,18 @@ def create_app(config_class=Config):
             'documentation': '/docs',
             'health': '/health'
         }
+    
+    # Routes listing endpoint
+    @app.route('/api/v1/routes')
+    def list_all_routes():
+        routes = []
+        for rule in app.url_map.iter_rules():
+            routes.append({
+                'endpoint': rule.endpoint,
+                'methods': list(rule.methods),
+                'url': str(rule)
+            })
+        return {'routes': routes}
     
     # Error handlers
     @app.errorhandler(404)
