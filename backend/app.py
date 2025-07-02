@@ -238,6 +238,15 @@ def create_app():
             "docs": "https://retailgenie.docs.com"
         })
     
+    @app.route("/status", methods=["GET"])
+    def simple_status():
+        """Simple status endpoint for deployment monitoring"""
+        return jsonify({
+            "status": "ok",
+            "timestamp": datetime.now().isoformat(),
+            "service": "RetailGenie API"
+        })
+
     @app.route("/api/v1/health", methods=["GET"])
     def health_check():
         """Comprehensive health check endpoint"""

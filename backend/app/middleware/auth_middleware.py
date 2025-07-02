@@ -36,13 +36,29 @@ class AuthMiddleware:
             # Skip auth for certain endpoints
             exempt_endpoints = [
                 'health_check',
-                'api_info',
+                'simple_status',
+                'root',
+                'get_routes',
+                'list_all_routes',
                 'auth_bp.login',
                 'auth_bp.register',
                 'auth_bp.forgot_password'
             ]
             
-            if request.endpoint in exempt_endpoints:
+            # Also skip auth for specific paths
+            exempt_paths = [
+                '/',
+                '/status',
+                '/api/v1/health',
+                '/api/v1/routes',
+                '/api/v1/auth/login',
+                '/api/v1/auth/register',
+                '/api/auth/login',
+                '/api/auth/register',
+                '/api/auth/forgot-password'
+            ]
+            
+            if request.endpoint in exempt_endpoints or request.path in exempt_paths:
                 return None
                 
             # Skip auth for OPTIONS requests (CORS preflight)
