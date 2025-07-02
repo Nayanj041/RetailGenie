@@ -131,6 +131,43 @@ def create_app(config_class=Config):
             })
         return {'routes': routes}
     
+    # Test auth endpoint - generates a test JWT token
+    @app.route('/api/v1/auth/test-token', methods=['POST'])
+    def get_test_token():
+        """Generate a test JWT token for API testing"""
+        import jwt
+        from datetime import datetime, timedelta
+        
+        try:
+            secret_key = app.config.get('JWT_SECRET', 'dev-jwt-secret')
+            
+            # Create test user payload
+            payload = {
+                'user_id': 'test_user_123',
+                'email': 'testuser@retailgenie.com',
+                'role': 'user',
+                'exp': datetime.utcnow() + timedelta(hours=24),
+                'iat': datetime.utcnow()
+            }
+            
+            # Generate token
+            token = jwt.encode(payload, secret_key, algorithm='HS256')
+            
+            return {
+                'success': True,
+                'token': token,
+                'user': {
+                    'id': 'test_user_123',
+                    'email': 'testuser@retailgenie.com',
+                    'name': 'Test User',
+                    'role': 'user'
+                },
+                'expires_in': '24 hours',
+                'usage': 'Include in Authorization header as: Bearer ' + token
+            }
+        except Exception as e:
+            return {'error': str(e)}, 500
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
