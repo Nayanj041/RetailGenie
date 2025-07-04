@@ -4,6 +4,8 @@ import Hero from './components/Hero';
 import Features from "./components/Features";
 import AnalyticsPreview from "./components/AnalyticsPreview";
 import ChatPreview from "./components/ChatPreview";
+import CTASection from "./components/CTASection";
+
 
 function App() {
   return (
@@ -13,6 +15,7 @@ function App() {
       <Features />
       <AnalyticsPreview />
       <ChatPreview />
+      <CTASection />
     </div>
   );
 }
