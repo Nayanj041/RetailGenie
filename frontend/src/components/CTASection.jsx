@@ -4,12 +4,12 @@ import { Sparkles } from "lucide-react";
 
 const CTASection = () => {
   return (
-    <section className="bg-gradient-to-br from-indigo-600 to-purple-600 py-20 px-6 md:px-20 text-white">
+    <section className="bg-gradient-to-br from-indigo-600 to-purple-600 py-20 px-4 sm:px-6 md:px-20 text-white">
       <div className="max-w-4xl mx-auto text-center">
         <div className="flex justify-center mb-4 animate-bounce">
           <Sparkles className="w-8 h-8 text-yellow-300" />
         </div>
-        <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6 animate-fade-in">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6 animate-fade-in">
           Ready to unlock smarter shopping with RetailGenie?
         </h2>
         <p className="text-lg md:text-xl mb-10 text-indigo-100">
