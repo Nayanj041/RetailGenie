@@ -14,7 +14,7 @@ function App() {
       <Navbar />
       <Hero />
       <Features />
-      <AnalyticsPreview />
+      <Analytics />
       <ChatPreview />
       <CTASection />
       <Footer />
