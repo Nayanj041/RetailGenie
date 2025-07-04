@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from "./components/Features";
 import AnalyticsPreview from "./components/AnalyticsPreview";
+import ChatPreview from "./components/ChatPreview";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Hero />
       <Features />
       <AnalyticsPreview />
+      <ChatPreview />
     </div>
   );
 }
