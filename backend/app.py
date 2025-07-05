@@ -423,40 +423,64 @@ def create_app():
                 "timestamp": datetime.now().isoformat()
             }), 500
 
-    @app.route("/api/v1/database/init", methods=["POST"])
+    @app.route("/api/v1/database/init", methods=["GET", "POST"])
     def initialize_database():
-        """Initialize database with sample data"""
+        """Initialize database with sample data or check initialization status"""
         try:
-            # Create sample collections if they don't exist
             collections_to_init = ["users", "products", "orders", "customers", "inventory", "feedback"]
             
-            results = {}
-            for collection in collections_to_init:
-                try:
-                    # Check if collection exists
-                    existing_docs = firebase.get_documents(collection) or []
-                    if len(existing_docs) == 0:
-                        # Create sample document
-                        sample_data = {
-                            "id": str(uuid.uuid4()),
-                            "created_at": datetime.now().isoformat(),
-                            "type": "sample",
-                            "initialized": True
+            if request.method == "GET":
+                # GET request: Return initialization status
+                status = {}
+                for collection in collections_to_init:
+                    try:
+                        existing_docs = firebase.get_documents(collection) or []
+                        status[collection] = {
+                            "exists": len(existing_docs) > 0,
+                            "document_count": len(existing_docs)
                         }
-                        firebase.create_document(collection, sample_data)
-                        results[collection] = "initialized"
-                    else:
-                        results[collection] = f"exists ({len(existing_docs)} docs)"
-                except Exception as e:
-                    results[collection] = f"error: {str(e)}"
+                    except Exception as e:
+                        status[collection] = {
+                            "exists": False,
+                            "error": str(e)
+                        }
+                
+                return jsonify({
+                    "success": True,
+                    "message": "Database initialization status",
+                    "database_connected": firebase.db is not None,
+                    "collections": status,
+                    "timestamp": datetime.now().isoformat()
+                })
             
-            return jsonify({
-                "success": True,
-                "message": "Database initialization completed",
-                "collections": results,
-                "timestamp": datetime.now().isoformat()
-            })
-            
+            else:  # POST request: Initialize database
+                results = {}
+                for collection in collections_to_init:
+                    try:
+                        # Check if collection exists
+                        existing_docs = firebase.get_documents(collection) or []
+                        if len(existing_docs) == 0:
+                            # Create sample document
+                            sample_data = {
+                                "id": str(uuid.uuid4()),
+                                "created_at": datetime.now().isoformat(),
+                                "type": "sample",
+                                "initialized": True
+                            }
+                            firebase.create_document(collection, sample_data)
+                            results[collection] = "initialized"
+                        else:
+                            results[collection] = f"exists ({len(existing_docs)} docs)"
+                    except Exception as e:
+                        results[collection] = f"error: {str(e)}"
+                
+                return jsonify({
+                    "success": True,
+                    "message": "Database initialization completed",
+                    "collections": results,
+                    "timestamp": datetime.now().isoformat()
+                })
+                
         except Exception as e:
             logger.error(f"Database initialization error: {str(e)}")
             return jsonify({
