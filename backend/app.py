@@ -1106,6 +1106,32 @@ def create_app():
             logger.error(f"AI chat error: {str(e)}")
             return jsonify({"success": False, "error": str(e)}), 500
 
+    @app.route("/api/chat", methods=["POST"])
+    def simple_chat():
+        """Simple chat endpoint for compatibility (redirects to AI chat)"""
+        try:
+            data, error_response, status_code = get_json_data()
+            if error_response:
+                return error_response, status_code
+            
+            message = data.get("message", "").strip()
+            if not message:
+                return jsonify({"success": False, "error": "Message is required"}), 400
+            
+            # Use the same logic as the advanced AI chat
+            response = generate_smart_ai_response(message, firebase)
+            
+            return jsonify({
+                "response": response,
+                "message": message,
+                "timestamp": datetime.now().isoformat(),
+                "status": "success"
+            }), 200
+                
+        except Exception as e:
+            logger.error(f"Simple chat error: {str(e)}")
+            return jsonify({"error": str(e), "status": "error"}), 500
+
     def generate_smart_ai_response(message, firebase):
         """Generate intelligent fallback AI responses based on actual data"""
         message_lower = message.lower()
