@@ -1,7 +1,7 @@
 """
 RetailGenie FINAL Complete Advanced Backend
 AI-Powered Retail Management System with ALL Features Integrated
-Version 4.0 - Production Ready with Full Feature Set (45+ Endpoints)
+Version 4.1 - Production Ready with Auth-Free Chat Endpoints
 """
 
 import logging
