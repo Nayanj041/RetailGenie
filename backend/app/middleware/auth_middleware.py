@@ -58,7 +58,11 @@ class AuthMiddleware:
                 '/api/v1/auth/register',
                 '/api/auth/login',
                 '/api/auth/register',
-                '/api/auth/forgot-password'
+                '/api/auth/forgot-password',
+                '/api/chat',
+                '/api/v1/ai/chat',
+                '/api/v1/dashboard/stats',
+                '/api/v1/analytics/dashboard'
             ]
             
             if request.endpoint in exempt_endpoints or request.path in exempt_paths:
