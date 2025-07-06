@@ -17,7 +17,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from utils.firebase_utils import FirebaseUtils
+from app.utils.firebase_utils import FirebaseUtils
 
 # Load environment variables
 load_dotenv()
@@ -1228,6 +1228,65 @@ def create_app():
                 500,
             )
 
+    # Main Analytics Endpoint (for frontend compatibility)
+    @app.route("/api/v1/analytics", methods=["GET"])
+    @require_auth
+    @limiter.limit("60 per hour")
+    def get_analytics():
+        """Get analytics data"""
+        try:
+            time_range = request.args.get("time_range", "week")
+
+            # Mock analytics data (in production, integrate with real data and ML models)
+            analytics_data = {
+                "overview": {
+                    "total_revenue": 125340.50,
+                    "revenue_change": 12.5,
+                    "total_orders": 1234,
+                    "orders_change": 8.3,
+                    "total_customers": 856,
+                    "customers_change": 15.2,
+                    "conversion_rate": 3.4,
+                    "conversion_change": -2.1,
+                },
+                "sales_trend": [
+                    {"date": "2024-07-01", "revenue": 12000, "orders": 120},
+                    {"date": "2024-07-02", "revenue": 15000, "orders": 145},
+                    {"date": "2024-07-03", "revenue": 18000, "orders": 160},
+                    {"date": "2024-07-04", "revenue": 14000, "orders": 135},
+                    {"date": "2024-07-05", "revenue": 22000, "orders": 180},
+                ],
+                "top_products": [
+                    {"name": "Smart Headphones", "sales": 450, "revenue": 89910},
+                    {"name": "Cotton T-Shirt", "sales": 320, "revenue": 9597},
+                    {"name": "Programming Book", "sales": 180, "revenue": 8998},
+                    {"name": "Running Shoes", "sales": 150, "revenue": 14985},
+                    {"name": "Coffee Mug", "sales": 280, "revenue": 4200},
+                ],
+                "category_distribution": [
+                    {"name": "Electronics", "value": 45, "revenue": 67500},
+                    {"name": "Clothing", "value": 30, "revenue": 22500},
+                    {"name": "Books", "value": 15, "revenue": 11250},
+                    {"name": "Home & Garden", "value": 10, "revenue": 7500},
+                ],
+                "customer_segments": [
+                    {"segment": "Premium", "customers": 150, "avg_order_value": 285},
+                    {"segment": "Regular", "customers": 400, "avg_order_value": 125},
+                    {"segment": "New", "customers": 306, "avg_order_value": 85},
+                ],
+                "time_range": time_range,
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+            }
+
+            return create_success_response(analytics_data)
+
+        except Exception as e:
+            logger.error(f"Error getting analytics: {str(e)}")
+            return (
+                create_error_response("Failed to get analytics", 500, request.path),
+                500,
+            )
+
     # Feedback Endpoints
     @app.route("/api/feedback/<product_id>", methods=["GET"])
     def get_feedback(product_id):
@@ -1839,7 +1898,6 @@ def create_app():
                 500,
             )
 
-    return app
 
 
 if __name__ == "__main__":
