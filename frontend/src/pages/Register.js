@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Store, Building, Phone } from 'lucide-react';
 import { useAuth } from '../utils/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -21,6 +21,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const { register } = useAuth();
+  const navigate = useNavigate();
 
   const businessTypes = [
     { value: 'retail', label: 'Retail Store' },
@@ -96,7 +97,15 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await register(formData);
+      const result = await register(formData);
+      
+      if (result?.success !== false) {
+        console.log('✅ Registration successful, redirecting to dashboard...');
+        navigate('/dashboard');
+      } else {
+        console.error('❌ Registration failed');
+        setErrors({ general: result?.error || 'Registration failed. Please try again.' });
+      }
     } catch (error) {
       console.error('Registration error:', error);
       setErrors({ general: error.message || 'Registration failed. Please try again.' });

@@ -17,7 +17,14 @@ const Login = () => {
     setLoading(true);
     
     try {
-      await login(email, password);
+      const result = await login(email, password);
+      
+      if (result?.success !== false) {
+        console.log('✅ Login successful, redirecting to dashboard...');
+        navigate('/dashboard');
+      } else {
+        console.error('❌ Login failed');
+      }
     } catch (error) {
       console.error('Login error:', error);
     } finally {

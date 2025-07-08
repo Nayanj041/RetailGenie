@@ -86,7 +86,7 @@ export function AuthProvider({ children }) {
       const data = await response.json();
       console.log('📝 Login response data:', data);
 
-      if (response.ok) {
+      if (response.ok && data.success) {
         localStorage.setItem('token', data.token);
         setUser(data.user);
         toast.success('Login successful!');
@@ -131,7 +131,7 @@ export function AuthProvider({ children }) {
       const data = await response.json();
       console.log('📝 Registration response data:', data);
 
-      if (response.ok) {
+      if (response.ok && data.success) {
         localStorage.setItem('token', data.token);
         setUser(data.user);
         toast.success('Registration successful!');
