@@ -1,198 +1,146 @@
 """
 RetailGenie Backend Configuration
-Perfect Structure Implementation
+Production-ready configuration for Render deployment with proper CORS settings
 """
 
 import os
-from datetime import timedelta
-from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables
-BASE_DIR = Path(__file__).parent.parent
-load_dotenv(BASE_DIR / '.env')
+load_dotenv()
 
-class Config:
-    """Base configuration class"""
-
-    # Basic Flask configuration
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-in-production"
-    DEBUG = os.environ.get("FLASK_DEBUG", "False").lower() in ["true", "1", "yes"]
-    FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
+class BaseConfig:
+    """Base configuration with common settings"""
     
-    # API Configuration
-    API_VERSION = '1.0.0'
-    API_TITLE = 'RetailGenie API'
-    API_DESCRIPTION = 'AI-powered retail management system'
-
-    # JWT Configuration
-    JWT_SECRET_KEY = (
-        os.environ.get("JWT_SECRET_KEY") or "jwt-secret-key-change-in-production"
-    )
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
-
-    # Firebase Configuration
-    FIREBASE_CREDENTIALS_PATH = os.environ.get("FIREBASE_CREDENTIALS_PATH")
-    FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID")
-
-    # Email Configuration
-    SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
-    SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
-    SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
-    SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD")
-    ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@retailgenie.com")
-
-    # Google Gemini Configuration
-    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-    GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-pro")
-
-    # File Upload Configuration
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
-    UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", "uploads")
-
-    # PDF Reports Configuration
-    PDF_OUTPUT_DIR = os.environ.get("PDF_OUTPUT_DIR", "reports")
-
-    # CORS Configuration
-    CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,https://retailgenie-1.onrender.com").split(",")
-
-    # Pagination Configuration
-    DEFAULT_PAGE_SIZE = 20
-    MAX_PAGE_SIZE = 100
-
-    # Cache Configuration
-    CACHE_TYPE = os.environ.get("CACHE_TYPE", "simple")
-    CACHE_DEFAULT_TIMEOUT = 300  # 5 minutes
-
-    # Logging Configuration
-    LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
-    LOG_FILE = os.environ.get("LOG_FILE", "app.log")
-
-    # Rate Limiting Configuration
-    RATELIMIT_STORAGE_URL = os.environ.get("REDIS_URL", "memory://")
-    RATELIMIT_DEFAULT = "100 per hour"
-
-    # Security Configuration
-    SESSION_COOKIE_SECURE = os.environ.get(
-        "SESSION_COOKIE_SECURE", "False"
-    ).lower() in ["true", "1", "yes"]
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Lax"
-
-    # API Configuration
-    API_VERSION = "v1"
-    API_TITLE = "RetailGenie API"
-    API_DESCRIPTION = "AI-powered retail management system"
-
-    # Business Rules Configuration
-    MIN_RATING = 1
-    MAX_RATING = 5
-    LOW_STOCK_THRESHOLD = 10
-    LOW_RATING_THRESHOLD = 2
-
-    # AI Configuration
-    MAX_SEARCH_RESULTS = 50
-    MAX_RECOMMENDATIONS = 15
-    SENTIMENT_THRESHOLD = 0.5
-
-
-class DevelopmentConfig(Config):
-    """Development configuration"""
-
-    DEBUG = True
-    CORS_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://retailgenie-1.onrender.com"]
-
-
-class ProductionConfig(Config):
-    """Production configuration"""
-
-    DEBUG = False
+    # Flask settings
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    JWT_SECRET = os.environ.get('JWT_SECRET', 'dev-jwt-secret-change-in-production')
+    
+    # Firebase configuration
+    FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', 'retailgenie-demo')
+    FIREBASE_PRIVATE_KEY_ID = os.environ.get('FIREBASE_PRIVATE_KEY_ID')
+    FIREBASE_PRIVATE_KEY = os.environ.get('FIREBASE_PRIVATE_KEY')
+    FIREBASE_CLIENT_EMAIL = os.environ.get('FIREBASE_CLIENT_EMAIL')
+    FIREBASE_CLIENT_ID = os.environ.get('FIREBASE_CLIENT_ID')
+    FIREBASE_AUTH_URI = os.environ.get('FIREBASE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth')
+    FIREBASE_TOKEN_URI = os.environ.get('FIREBASE_TOKEN_URI', 'https://oauth2.googleapis.com/token')
+    FIREBASE_CLIENT_CERT_URL = os.environ.get('FIREBASE_CLIENT_CERT_URL')
+    
+    # API settings
+    API_VERSION = 'v1'
+    API_PREFIX = f'/api/{API_VERSION}'
+    
+    # CORS settings - Include all necessary origins for production
+    CORS_ORIGINS = [
+        'http://localhost:3000',
+        'http://localhost:3001', 
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'https://retailgenie-1.onrender.com',  # Render frontend  # Another potential frontend URL
+    ]
+    
+    # Additional CORS from environment (comma-separated)
+    env_cors = os.environ.get('CORS_ORIGINS', '')
+    if env_cors:
+        CORS_ORIGINS.extend([origin.strip() for origin in env_cors.split(',') if origin.strip()])
+    
+    # Remove duplicates while preserving order
+    CORS_ORIGINS = list(dict.fromkeys(CORS_ORIGINS))
+    
+    # Security settings
+    CORS_SUPPORTS_CREDENTIALS = True
+    CORS_ALLOW_HEADERS = [
+        'Content-Type',
+        'Authorization',
+        'Access-Control-Allow-Credentials',
+        'Access-Control-Allow-Origin',
+        'Access-Control-Allow-Headers',
+        'Access-Control-Allow-Methods'
+    ]
+    CORS_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    
+    # Database settings
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    
+    # ML/AI settings
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+    
+    # Rate limiting
+    RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL', 'memory://')
+    
+    # Logging
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+    
+    # File upload settings
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file upload
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', 'uploads')
+    
+    # Session settings
+    PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
     SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
 
-    # Override any production-specific settings
-    LOG_LEVEL = "WARNING"
-    RATELIMIT_DEFAULT = "1000 per hour"
-
-
-class TestingConfig(Config):
-    """Testing configuration"""
-
-    TESTING = True
+class DevelopmentConfig(BaseConfig):
+    """Development configuration"""
     DEBUG = True
+    TESTING = False
+    
+    # Keep all CORS origins for development (don't override)
+    # This ensures local development works with Render backend
 
+class ProductionConfig(BaseConfig):
+    """Production configuration for Render deployment"""
+    DEBUG = False
+    TESTING = False
+    
+    # Production security
+    SESSION_COOKIE_SECURE = True
+    
+    # Production logging
+    LOG_LEVEL = 'WARNING'
+    
+    # Ensure production secrets are set
+    def __init__(self):
+        super().__init__()
+        if self.SECRET_KEY == 'dev-secret-key-change-in-production':
+            print("⚠️  WARNING: Using default SECRET_KEY in production!")
+        if self.JWT_SECRET == 'dev-jwt-secret-change-in-production':
+            print("⚠️  WARNING: Using default JWT_SECRET in production!")
+
+class TestingConfig(BaseConfig):
+    """Testing configuration"""
+    DEBUG = True
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+    
     # Use in-memory database for testing
-    FIREBASE_CREDENTIALS_PATH = None
+    DATABASE_URL = 'sqlite:///:memory:'
 
-    # Disable email sending in tests
-    SENDER_EMAIL = None
-
-    # Use faster password hashing for tests
-    BCRYPT_LOG_ROUNDS = 4
-
-
-# Configuration dictionary
+# Configuration mapping
 config = {
-    "development": DevelopmentConfig,
-    "production": ProductionConfig,
-    "testing": TestingConfig,
-    "default": DevelopmentConfig,
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'testing': TestingConfig,
+    'default': DevelopmentConfig
 }
-
 
 def get_config():
     """Get configuration based on environment"""
-    env = os.environ.get("FLASK_ENV", "development")
-    return config.get(env, config["default"])
+    env = os.environ.get('FLASK_ENV', 'development').lower()
+    return config.get(env, config['default'])
 
+# For direct import
+Config = get_config()
 
-# Environment variables documentation
-ENV_VARS_DOCUMENTATION = """
-Required Environment Variables:
-===============================
-
-Core Configuration:
-- SECRET_KEY: Flask secret key for sessions
-- JWT_SECRET_KEY: JWT token signing key
-- FLASK_ENV: Environment (development/production/testing)
-
-Firebase Configuration:
-- FIREBASE_CREDENTIALS_PATH: Path to Firebase service account JSON file
-- FIREBASE_PROJECT_ID: Firebase project ID
-
-Email Configuration:
-- SMTP_SERVER: SMTP server address (default: smtp.gmail.com)
-- SMTP_PORT: SMTP server port (default: 587)
-- SENDER_EMAIL: Email address for sending notifications
-- SENDER_PASSWORD: Password or app password for sender email
-- ADMIN_EMAIL: Admin email for notifications
-
-AI Configuration:
-- GEMINI_API_KEY: Google Gemini API key for AI features
-
-Optional Configuration:
-- CORS_ORIGINS: Comma-separated list of allowed origins
-- LOG_LEVEL: Logging level (DEBUG/INFO/WARNING/ERROR)
-- UPLOAD_FOLDER: Directory for file uploads
-- PDF_OUTPUT_DIR: Directory for PDF reports
-- REDIS_URL: Redis URL for rate limiting (optional)
-
-Example .env file:
-==================
-SECRET_KEY=your-super-secret-key
-JWT_SECRET_KEY=your-jwt-secret-key
-FLASK_ENV=development
-
-FIREBASE_CREDENTIALS_PATH=/path/to/firebase-credentials.json
-FIREBASE_PROJECT_ID=your-firebase-project
-
-SENDER_EMAIL=your-email@gmail.com
-SENDER_PASSWORD=your-app-password
-ADMIN_EMAIL=admin@yourcompany.com
-
-GEMINI_API_KEY=your-gemini-api-key
-
-CORS_ORIGINS=http://localhost:3000,https://yourfrontend.com
-"""
-
-if __name__ == "__main__":
-    print(ENV_VARS_DOCUMENTATION)
+# Debug information
+if __name__ == '__main__':
+    print("RetailGenie Configuration")
+    print("=" * 50)
+    current_config = get_config()()
+    print(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
+    print(f"Debug: {current_config.DEBUG}")
+    print(f"CORS Origins: {current_config.CORS_ORIGINS}")
+    print(f"API Prefix: {current_config.API_PREFIX}")
+    print(f"Firebase Project: {current_config.FIREBASE_PROJECT_ID}")
