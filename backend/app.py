@@ -1638,7 +1638,8 @@ def create_app():
             return jsonify({"success": False, "error": str(e)}), 500
 
     return app
-
+# Create app instance for WSGI servers (like Gunicorn)
+app = create_app()
 
 if __name__ == "__main__":
     app = create_app()
