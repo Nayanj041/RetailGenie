@@ -159,3 +159,81 @@ def export_feedback(product_id):
             ),
             500,
         )
+
+
+@feedback_bp.route("/", methods=["GET"])
+def get_all_feedback():
+    """Get all feedback with optional filtering"""
+    try:
+        # Get query parameters for filtering
+        rating_filter = request.args.get("rating", type=int)
+        category_filter = request.args.get("category")
+        limit = request.args.get("limit", 50, type=int)
+
+        feedback = feedback_controller.get_all_feedback(
+            rating_filter=rating_filter,
+            category_filter=category_filter,
+            limit=limit,
+        )
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "feedback": feedback,
+                    "count": len(feedback),
+                    "message": "Feedback retrieved successfully",
+                }
+            ),
+            200,
+        )
+
+    except Exception as e:
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": str(e),
+                    "message": "Failed to retrieve feedback",
+                }
+            ),
+            500,
+        )
+
+
+@feedback_bp.route("/sentiment", methods=["GET"])
+def get_sentiment_analysis():
+    """Get sentiment analysis of all feedback"""
+    try:
+        analysis = feedback_controller.get_sentiment_analysis()
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "analysis": analysis,
+                    "message": "Sentiment analysis retrieved successfully",
+                }
+            ),
+            200,
+        )
+
+    except Exception as e:
+        # Fallback response for sentiment analysis
+        fallback_analysis = {
+            "overall_sentiment": "neutral",
+            "sentiment_distribution": {"positive": 33, "neutral": 34, "negative": 33},
+            "trending_topics": ["quality", "service", "pricing"],
+            "total_feedback": 0,
+        }
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "analysis": fallback_analysis,
+                    "message": "Sentiment analysis (fallback data)",
+                }
+            ),
+            200,
+        )

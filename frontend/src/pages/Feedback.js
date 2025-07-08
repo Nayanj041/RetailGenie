@@ -33,10 +33,8 @@ const Feedback = () => {
   const fetchFeedback = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/feedback", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFeedback(response.data.feedback || []);
+      const response = await api.get("/api/v1/feedback");
+      setFeedback(response.data?.feedback || response.feedback || []);
     } catch (error) {
       console.error("Error fetching feedback:", error);
       // Fallback to empty data
@@ -49,10 +47,8 @@ const Feedback = () => {
 
   const fetchSentimentAnalysis = async () => {
     try {
-      const response = await api.get("/ml/sentiment/analysis", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSentimentAnalysis(response.data.analysis || {});
+      const response = await api.get("/api/v1/feedback/sentiment");
+      setSentimentAnalysis(response.data?.analysis || response.analysis || {});
     } catch (error) {
       console.error("Error fetching sentiment analysis:", error);
       setSentimentAnalysis({

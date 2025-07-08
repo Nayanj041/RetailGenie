@@ -32,7 +32,7 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await api.get("/customers");
+      const response = await api.get("/api/v1/customers");
       setCustomers(response.data);
     } catch (error) {
       console.error("Error fetching customers:", error);

@@ -39,7 +39,7 @@ const EditCustomer = () => {
 
   const fetchCustomer = async () => {
     try {
-      const response = await api.get(`/customers/${id}`);
+      const response = await api.get(`/api/v1/customers/${id}`);
       setFormData(response.data);
     } catch (error) {
       console.error("Error fetching customer:", error);

@@ -41,10 +41,8 @@ const Inventory = () => {
   const fetchInventory = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/inventory", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setInventory(response.data.items || []);
+      const response = await api.get("/api/v1/inventory");
+      setInventory(response.data?.items || response.items || []);
     } catch (error) {
       console.error("Error fetching inventory:", error);
       setInventory([]);
