@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailGenie Authentication Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .info {
+            color: #17a2b8;
+        }
+        #results {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 RetailGenie Authentication Test</h1>
+        
+        <div class="test-section">
+            <h3>📡 Backend Connection Test</h3>
+            <button onclick="testBackendHealth()">Test Backend Health</button>
+            <div id="health-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 User Registration Test</h3>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="reg-email" placeholder="test@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="reg-password" value="testpass123">
+            </div>
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="reg-name" value="Test User">
+            </div>
+            <div class="form-group">
+                <label>Business Name:</label>
+                <input type="text" id="reg-business" value="Test Business">
+            </div>
+            <button onclick="testRegistration()">Test Registration</button>
+            <button onclick="generateRandomEmail()">Generate Random Email</button>
+            <div id="registration-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔐 User Login Test</h3>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="login-email" value="demo@retailgenie.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="login-password" value="demo123456">
+            </div>
+            <button onclick="testLogin()">Test Login</button>
+            <button onclick="useRegisteredUser()">Use Registered User</button>
+            <div id="login-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🛡️ Authenticated Request Test</h3>
+            <button onclick="testAuthenticatedRequest()">Test Products API</button>
+            <div id="auth-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Complete Test Suite</h3>
+            <button onclick="runFullTest()" style="background: #28a745;">Run All Tests</button>
+            <button onclick="clearResults()">Clear Results</button>
+            <div id="full-test-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        let currentToken = null;
+        let registeredUser = null;
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            results.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function setStatus(elementId, message, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${isSuccess ? 'success' : 'error'}">${message}</div>`;
+        }
+
+        function generateRandomEmail() {
+            const timestamp = Date.now();
+            const email = `test${timestamp}@retailgenie.com`;
+            document.getElementById('reg-email').value = email;
+            log(`Generated random email: ${email}`);
+        }
+
+        function useRegisteredUser() {
+            if (registeredUser) {
+                document.getElementById('login-email').value = registeredUser.email;
+                document.getElementById('login-password').value = registeredUser.password;
+                log('Using registered user credentials for login');
+            } else {
+                log('No registered user available. Register first.', 'error');
+            }
+        }
+
+        async function testBackendHealth() {
+            log('Testing backend health...');
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('Backend health check: SUCCESS', 'success');
+                    log(`Response: ${JSON.stringify(data, null, 2)}`);
+                    setStatus('health-status', '✅ Backend is healthy and responding', true);
+                    return true;
+                } else {
+                    log('Backend health check: FAILED', 'error');
+                    setStatus('health-status', '❌ Backend health check failed', false);
+                    return false;
+                }
+            } catch (error) {
+                log(`Backend health check error: ${error.message}`, 'error');
+                setStatus('health-status', '❌ Cannot connect to backend', false);
+                return false;
+            }
+        }
+
+        async function testRegistration() {
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const name = document.getElementById('reg-name').value;
+            const business_name = document.getElementById('reg-business').value;
+
+            if (!email) {
+                log('Please enter an email for registration', 'error');
+                return;
+            }
+
+            log(`Testing registration for: ${email}`);
+            
+            const userData = { email, password, name, business_name };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    log('Registration: SUCCESS', 'success');
+                    log(`User ID: ${data.user?.id}`);
+                    log(`Token: ${data.token?.substring(0, 20)}...`);
+                    
+                    registeredUser = { email, password };
+                    currentToken = data.token;
+                    
+                    setStatus('registration-status', '✅ Registration successful!', true);
+                    return data;
+                } else {
+                    log(`Registration failed: ${data.message}`, 'error');
+                    setStatus('registration-status', `❌ Registration failed: ${data.message}`, false);
+                    return null;
+                }
+            } catch (error) {
+                log(`Registration error: ${error.message}`, 'error');
+                setStatus('registration-status', '❌ Registration error occurred', false);
+                return null;
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                log('Please enter email and password for login', 'error');
+                return;
+            }
+
+            log(`Testing login for: ${email}`);
+            
+            const loginData = { email, password };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    log('Login: SUCCESS', 'success');
+                    log(`User: ${data.user?.name}`);
+                    log(`Email: ${data.user?.email}`);
+                    log(`Token: ${data.token?.substring(0, 20)}...`);
+                    
+                    currentToken = data.token;
+                    localStorage.setItem('testToken', data.token);
+                    
+                    setStatus('login-status', '✅ Login successful!', true);
+                    return data;
+                } else {
+                    log(`Login failed: ${data.message}`, 'error');
+                    setStatus('login-status', `❌ Login failed: ${data.message}`, false);
+                    return null;
+                }
+            } catch (error) {
+                log(`Login error: ${error.message}`, 'error');
+                setStatus('login-status', '❌ Login error occurred', false);
+                return null;
+            }
+        }
+
+        async function testAuthenticatedRequest() {
+            const token = currentToken || localStorage.getItem('testToken');
+            
+            if (!token) {
+                log('No authentication token available. Please login first.', 'error');
+                setStatus('auth-status', '❌ No token available. Login first.', false);
+                return;
+            }
+
+            log('Testing authenticated request...');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/products`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log('Authenticated request: SUCCESS', 'success');
+                    log(`Products count: ${data.count || 0}`);
+                    log(`Products: ${JSON.stringify(data.data, null, 2)}`);
+                    
+                    setStatus('auth-status', '✅ Authenticated request successful!', true);
+                    return data;
+                } else {
+                    log(`Authenticated request failed: ${data.message}`, 'error');
+                    setStatus('auth-status', `❌ Authenticated request failed: ${data.message}`, false);
+                    return null;
+                }
+            } catch (error) {
+                log(`Authenticated request error: ${error.message}`, 'error');
+                setStatus('auth-status', '❌ Authenticated request error occurred', false);
+                return null;
+            }
+        }
+
+        async function runFullTest() {
+            log('🚀 Running complete authentication test suite...', 'success');
+            setStatus('full-test-status', '🔄 Running tests...', true);
+            
+            const results = {};
+            
+            // Test 1: Health
+            log('\n1️⃣ Testing backend health...');
+            results.health = await testBackendHealth();
+            
+            if (!results.health) {
+                setStatus('full-test-status', '❌ Backend not available. Tests stopped.', false);
+                return;
+            }
+
+            // Test 2: Registration
+            log('\n2️⃣ Testing registration...');
+            generateRandomEmail(); // Generate unique email
+            results.registration = await testRegistration();
+            
+            // Test 3: Login
+            log('\n3️⃣ Testing login...');
+            if (results.registration) {
+                useRegisteredUser();
+            }
+            results.login = await testLogin();
+            
+            // Test 4: Authenticated request
+            log('\n4️⃣ Testing authenticated request...');
+            results.authenticated = await testAuthenticatedRequest();
+            
+            // Summary
+            const passed = Object.values(results).filter(Boolean).length;
+            const total = Object.keys(results).length;
+            
+            log(`\n📊 Test Results: ${passed}/${total} passed`, passed === total ? 'success' : 'error');
+            
+            if (passed === total) {
+                log('🎉 ALL TESTS PASSED! Authentication system working perfectly!', 'success');
+                setStatus('full-test-status', '✅ All tests passed! Authentication working perfectly!', true);
+            } else {
+                log('⚠️ Some tests failed. Check results above.', 'error');
+                setStatus('full-test-status', `❌ ${total - passed} test(s) failed. Check results.`, false);
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('results').textContent = '';
+            log('Test results cleared');
+        }
+
+        // Initialize
+        window.onload = function() {
+            log('🔧 RetailGenie Authentication Test Page Loaded');
+            log('📡 Backend URL: ' + API_BASE_URL);
+            log('👆 Click "Test Backend Health" to start testing');
+            
+            // Generate initial random email
+            generateRandomEmail();
+        };
+    </script>
+</body>
+</html>

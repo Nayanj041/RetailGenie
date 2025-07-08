@@ -60,6 +60,7 @@ const Shopping = () => {
 
   const addToCart = async (productId, quantity = 1) => {
     try {
+      const token = localStorage.getItem('token');
       await api.post('/cart/add', {
         product_id: productId,
         quantity
@@ -74,6 +75,7 @@ const Shopping = () => {
 
   const addToWishlist = async (productId) => {
     try {
+      const token = localStorage.getItem('token');
       await api.post('/wishlist/add', {
         product_id: productId
       }, {

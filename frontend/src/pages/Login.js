@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, Store } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, Store, Zap } from 'lucide-react';
 import { useAuth } from '../utils/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -10,6 +10,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,6 +20,30 @@ const Login = () => {
       await login(email, password);
     } catch (error) {
       console.error('Login error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Demo login function
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    
+    try {
+      console.log('🎯 Attempting demo login...');
+      
+      // Use demo credentials
+      const result = await login('demo@retailgenie.com', 'demo123456');
+      
+      if (result?.success !== false) {
+        console.log('✅ Demo login successful, redirecting to dashboard...');
+        // Navigate to dashboard after successful login
+        navigate('/dashboard');
+      } else {
+        console.log('❌ Demo login failed');
+      }
+    } catch (error) {
+      console.error('Demo login error:', error);
     } finally {
       setLoading(false);
     }
@@ -159,6 +184,22 @@ const Login = () => {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
+          </div>
+
+          {/* Demo Login Button */}
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className="group relative w-full flex justify-center py-3 px-4 border-2 border-dashed border-yellow-400 text-sm font-medium rounded-lg text-yellow-600 bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              {loading ? 'Demo Login...' : '🚀 Demo Login (Direct to Dashboard)'}
+            </button>
+            <p className="mt-2 text-xs text-gray-500 text-center">
+              Demo credentials: demo@retailgenie.com / demo123456
+            </p>
           </div>
 
 

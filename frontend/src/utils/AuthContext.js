@@ -15,8 +15,23 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Backend API base URL
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  // Backend API base URL - Use Codespace URL in production or localhost in development
+  const getApiBaseUrl = () => {
+    if (process.env.REACT_APP_API_URL) {
+      return process.env.REACT_APP_API_URL;
+    }
+    
+    // Check if we're in a GitHub Codespace
+    const codespace = process.env.CODESPACE_NAME || window.location.hostname.includes('app.github.dev');
+    if (codespace) {
+      const codespaceBase = window.location.hostname.replace('-3001', '-5000').replace('-3000', '-5000');
+      return `https://${codespaceBase}`;
+    }
+    
+    return 'http://127.0.0.1:5000';
+  };
+  
+  const API_BASE_URL = getApiBaseUrl();
 
   useEffect(() => {
     // Check for existing token on app start
@@ -56,6 +71,8 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true);
       
+      console.log('🔄 Starting login request...', { email, API_BASE_URL });
+      
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
@@ -64,7 +81,10 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('📡 Login response received:', { status: response.status, ok: response.ok });
+
       const data = await response.json();
+      console.log('📝 Login response data:', data);
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
@@ -76,7 +96,7 @@ export function AuthProvider({ children }) {
         return { success: false, error: data.message };
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       toast.error('Unable to connect to server. Please try again later.');
       return { success: false, error: 'Network error' };
     } finally {
@@ -87,6 +107,8 @@ export function AuthProvider({ children }) {
   const register = async (formData) => {
     try {
       setLoading(true);
+      
+      console.log('🔄 Starting registration request...', { email: formData.email, API_BASE_URL });
       
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
         method: 'POST',
@@ -104,7 +126,10 @@ export function AuthProvider({ children }) {
         }),
       });
 
+      console.log('📡 Registration response received:', { status: response.status, ok: response.ok });
+
       const data = await response.json();
+      console.log('📝 Registration response data:', data);
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
@@ -117,7 +142,7 @@ export function AuthProvider({ children }) {
         return { success: false, error: errorMessage };
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
       toast.error('Unable to connect to server. Please try again later.');
       return { success: false, error: 'Network error' };
     } finally {

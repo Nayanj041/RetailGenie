@@ -570,7 +570,13 @@ def create_app():
                 return error_response, status_code
             
             if "auth" in controllers:
-                result = controllers["auth"].login_user(data)
+                email = data.get("email")
+                password = data.get("password")
+                
+                if not email or not password:
+                    return jsonify({"success": False, "error": "Email and password required"}), 400
+                
+                result = controllers["auth"].login_user(email, password)
                 if result.get("success"):
                     token = generate_jwt_token(result.get("user", {}))
                     result["token"] = token
