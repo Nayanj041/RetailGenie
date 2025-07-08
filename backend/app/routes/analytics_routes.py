@@ -173,6 +173,7 @@ def get_gamification_leaderboard():
 
 
 @analytics_bp.route("/", methods=["GET"])
+@analytics_bp.route("", methods=["GET"])
 def get_analytics():
     """Get general analytics data"""
     try:

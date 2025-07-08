@@ -7,6 +7,7 @@ product_controller = ProductController()
 
 
 @product_bp.route("/", methods=["GET"])
+@product_bp.route("", methods=["GET"])
 def get_products():
     """Get all products with optional filters"""
     try:
@@ -159,6 +160,7 @@ def get_recommendations():
 
 
 @product_bp.route("/", methods=["POST"])
+@product_bp.route("", methods=["POST"])
 def create_product():
     """Create a new product"""
     try:

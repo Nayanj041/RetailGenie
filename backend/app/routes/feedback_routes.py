@@ -7,6 +7,7 @@ feedback_controller = FeedbackController()
 
 
 @feedback_bp.route("/", methods=["POST"])
+@feedback_bp.route("", methods=["POST"])
 def submit_feedback():
     """Submit user feedback"""
     try:
@@ -162,6 +163,7 @@ def export_feedback(product_id):
 
 
 @feedback_bp.route("/", methods=["GET"])
+@feedback_bp.route("", methods=["GET"])
 def get_all_feedback():
     """Get all feedback with optional filtering"""
     try:
