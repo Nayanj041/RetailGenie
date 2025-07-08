@@ -299,7 +299,6 @@ jobs:
         python -m pytest tests/test_firebase_utils.py -v \
           --cov=utils \
           --cov-report=xml
-      run: |
         python -m pytest tests/integration/test_simple_integration.py -v --cov=. --cov-report=xml
 
   load-testing:
