@@ -94,9 +94,19 @@ def create_app():
     
     # CORS configuration - Allow frontend connection
     cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,https://retailgenie-1.onrender.com').split(',')
-    CORS(app, origins=cors_origins, supports_credentials=True, 
-         allow_headers=['Content-Type', 'Authorization'],
-         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+    
+    # Add explicit frontend domain to ensure it's included
+    if 'https://retailgenie-1.onrender.com' not in cors_origins:
+        cors_origins.append('https://retailgenie-1.onrender.com')
+    
+    print(f"🌐 CORS Origins configured: {cors_origins}")
+    
+    CORS(app, 
+         origins=cors_origins, 
+         supports_credentials=True, 
+         allow_headers=['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+         expose_headers=['Content-Type', 'Authorization'])
     
     # Initialize Firebase
     firebase = FirebaseUtils()
