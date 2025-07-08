@@ -99,25 +99,40 @@ def create_app():
     if 'https://retailgenie-1.onrender.com' not in cors_origins:
         cors_origins.append('https://retailgenie-1.onrender.com')
     
+    # Add wildcard for development (remove in production if needed)
+    cors_origins.append('*')
+    
     print(f"🌐 CORS Origins configured: {cors_origins}")
     
+    # Enhanced CORS configuration with explicit settings
     CORS(app, 
          origins=cors_origins, 
          supports_credentials=True, 
-         allow_headers=['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-         expose_headers=['Content-Type', 'Authorization'])
+         allow_headers=['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With', 'Access-Control-Request-Method', 'Access-Control-Request-Headers'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+         expose_headers=['Content-Type', 'Authorization'],
+         max_age=86400)  # Cache preflight requests for 24 hours
     
     # Additional CORS headers for all requests
     @app.after_request
     def after_request(response):
         # Ensure CORS headers are present on all responses
         origin = request.headers.get('Origin')
-        if origin in cors_origins:
-            response.headers['Access-Control-Allow-Origin'] = origin
-        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept, Origin, X-Requested-With'
+        
+        # Allow specific origins or all origins (for development)
+        if origin in cors_origins or '*' in cors_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin if origin in cors_origins else 'https://retailgenie-1.onrender.com'
+        
+        # Set comprehensive CORS headers
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, HEAD'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept, Origin, X-Requested-With, Access-Control-Request-Method, Access-Control-Request-Headers'
         response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Max-Age'] = '86400'
+        
+        # Debug logging for CORS
+        if request.method == 'OPTIONS':
+            print(f"🔍 CORS Preflight: Origin={origin}, Method={request.headers.get('Access-Control-Request-Method')}")
+        
         return response
     
     # Initialize Firebase
@@ -314,6 +329,21 @@ def create_app():
                 "message": str(e),
                 "timestamp": datetime.now().isoformat()
             }), 500
+
+    @app.route("/api/v1/cors-test", methods=["GET", "POST", "OPTIONS"])
+    def cors_test():
+        """Simple CORS test endpoint"""
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        origin = request.headers.get('Origin', 'Unknown')
+        return jsonify({
+            "success": True,
+            "message": "CORS is working correctly",
+            "origin": origin,
+            "method": request.method,
+            "timestamp": datetime.now().isoformat()
+        }), 200
 
     @app.route("/api/v1/routes", methods=["GET"])
     def list_all_routes():
