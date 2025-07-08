@@ -91,7 +91,7 @@ const AddProduct = () => {
         }
       });
 
-      const response = await api.post("/products", submitData, {
+      const response = await api.post("/api/v1/products", submitData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -54,22 +54,18 @@ const Inventory = () => {
 
   const fetchPredictions = async () => {
     try {
-      const response = await api.get("/ml/inventory/forecast", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPredictions(response.data.predictions || {});
+      const response = await api.get("/api/v1/inventory/forecast");
+      setPredictions(response.data?.predictions || response.predictions || {});
     } catch (error) {
       console.error("Error fetching predictions:", error);
       setPredictions({});
-      toast.error("Failed to load predictions");
+      // Don't show error toast for predictions as it's not critical
     }
   };
 
   const addItem = async () => {
     try {
-      await api.post("/inventory", newItem, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.post("/api/v1/inventory", newItem);
       fetchInventory();
       setShowAddModal(false);
       setNewItem({

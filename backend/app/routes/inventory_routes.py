@@ -131,3 +131,81 @@ def get_geo_insights():
             ),
             500,
         )
+
+
+@inventory_bp.route("/", methods=["GET"])
+def get_inventory():
+    """Get all inventory items"""
+    try:
+        # Get query parameters for filtering
+        category = request.args.get("category")
+        low_stock = request.args.get("low_stock", type=bool)
+
+        items = inventory_controller.get_all_inventory(
+            category_filter=category, low_stock_only=low_stock
+        )
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "items": items,
+                    "count": len(items),
+                    "message": "Inventory retrieved successfully",
+                }
+            ),
+            200,
+        )
+    except Exception as e:
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": str(e),
+                    "message": "Failed to retrieve inventory",
+                }
+            ),
+            500,
+        )
+
+
+@inventory_bp.route("/", methods=["POST"])
+def add_inventory_item():
+    """Add new inventory item"""
+    try:
+        data = request.get_json()
+
+        # Validate required fields
+        required_fields = ["name", "sku", "quantity", "price"]
+        for field in required_fields:
+            if field not in data:
+                return (
+                    jsonify(
+                        {"success": False, "message": f"Missing required field: {field}"}
+                    ),
+                    400,
+                )
+
+        item_id = inventory_controller.add_inventory_item(data)
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "data": {"item_id": item_id},
+                    "message": "Inventory item added successfully",
+                }
+            ),
+            201,
+        )
+    except Exception as e:
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": str(e),
+                    "message": "Failed to add inventory item",
+                }
+            ),
+            500,
+        )
