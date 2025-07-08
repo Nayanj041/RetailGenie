@@ -14,6 +14,18 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def create_simple_app():
+    """
+    Create and configure a simple Flask application with CORS and mock authentication endpoints for testing.
+    
+    The returned Flask app includes:
+    - CORS enabled for localhost origins with credentials support.
+    - `/api/v1/health` (GET): Returns a JSON response indicating backend health.
+    - `/api/v1/auth/register` (POST): Accepts JSON registration data, validates required fields, and returns a mock registration response.
+    - `/api/v1/auth/login` (POST): Accepts JSON login data, validates credentials, and returns a mock login response.
+    
+    Returns:
+        app (Flask): A configured Flask application instance with test endpoints.
+    """
     app = Flask(__name__)
     
     # CORS configuration
@@ -24,10 +36,22 @@ def create_simple_app():
     
     @app.route('/api/v1/health', methods=['GET'])
     def health():
+        """
+        Return a JSON response indicating the backend server is healthy.
+        
+        Returns:
+            tuple: A tuple containing a JSON object with health status and HTTP status code 200.
+        """
         return jsonify({"status": "healthy", "message": "Backend is running"}), 200
     
     @app.route('/api/v1/auth/register', methods=['POST'])
     def register():
+        """
+        Handles user registration by validating required fields in a JSON payload and returns a mock registration response.
+        
+        Returns:
+            A JSON response indicating success with mock user data and token on valid input, or an error message with appropriate HTTP status code on failure.
+        """
         try:
             if not request.is_json:
                 return jsonify({"success": False, "error": "Content-Type must be application/json"}), 400
@@ -62,6 +86,12 @@ def create_simple_app():
     
     @app.route('/api/v1/auth/login', methods=['POST'])
     def login():
+        """
+        Handles user login requests by validating JSON input and returning a mock authentication response.
+        
+        Returns:
+            Response: A JSON response indicating success with a mock JWT token and user details on valid input, or an error message with the appropriate HTTP status code on failure.
+        """
         try:
             if not request.is_json:
                 return jsonify({"success": False, "error": "Content-Type must be application/json"}), 400

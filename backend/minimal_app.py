@@ -15,6 +15,14 @@ from flask_cors import CORS
 sys.path.insert(0, '/workspaces/RetailGenie/backend')
 
 def create_minimal_app():
+    """
+    Create and configure a minimal Flask application for testing retailer registration and login with JWT authentication.
+    
+    The app includes CORS support for localhost, helper functions for JSON request parsing and JWT token generation, and routes for health check, retailer registration, and login. No persistent storage or real authentication is implemented; all operations are simulated for testing purposes.
+    
+    Returns:
+        app (Flask): The configured Flask application instance.
+    """
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'test-secret-key'
     app.config['JWT_SECRET'] = 'test-jwt-secret'
@@ -23,7 +31,12 @@ def create_minimal_app():
     CORS(app, origins=['http://localhost:3000'], supports_credentials=True)
     
     def get_json_data():
-        """Helper to get JSON data from request"""
+        """
+        Safely extracts JSON data from the incoming Flask request.
+        
+        Returns:
+            tuple: A tuple containing (data, error_response, status_code), where `data` is the parsed JSON object or None, `error_response` is a Flask response object with an error message or None, and `status_code` is the HTTP status code for errors or None if successful.
+        """
         try:
             if not request.is_json:
                 return None, jsonify({"success": False, "error": "Content-Type must be application/json"}), 400
@@ -35,7 +48,15 @@ def create_minimal_app():
             return None, jsonify({"success": False, "error": f"Invalid JSON: {str(e)}"}), 400
     
     def generate_jwt_token(user_data):
-        """Generate JWT token for user"""
+        """
+        Generate a JWT token for the given user data with a 24-hour expiration.
+        
+        Parameters:
+            user_data (dict): Dictionary containing user information, including at least 'id' and 'email'.
+        
+        Returns:
+            str: Encoded JWT token as a string.
+        """
         payload = {
             'user_id': user_data.get('id'),
             'email': user_data.get('email'),
@@ -46,11 +67,21 @@ def create_minimal_app():
     
     @app.route('/api/v1/health', methods=['GET'])
     def health():
+        """
+        Return a JSON response indicating the backend service is operational.
+        
+        Returns:
+            Response: A Flask JSON response with status "ok" and a message confirming the backend is running.
+        """
         return jsonify({"status": "ok", "message": "RetailGenie Backend is running"})
     
     @app.route('/api/v1/auth/register', methods=['POST'])
     def register():
-        """Retailer registration - business accounts only"""
+        """
+        Handles retailer registration by validating input data, simulating user creation, and returning a JWT token and user information.
+        
+        Accepts a JSON payload with email, password, name, and business_name fields. Validates required fields, email format, and password length. Simulates registration by hashing the password and generating a user object with a unique ID. Returns a JSON response with a JWT token, user data, and success message upon successful registration, or an error message with the appropriate HTTP status code on failure.
+        """
         try:
             data, error_response, status_code = get_json_data()
             if error_response:
@@ -110,7 +141,11 @@ def create_minimal_app():
     
     @app.route('/api/v1/auth/login', methods=['POST'])
     def login():
-        """Login endpoint for testing"""
+        """
+        Handles retailer login for testing purposes by validating input and returning a mock user object with a JWT token.
+        
+        Accepts a POST request with JSON containing 'email' and 'password'. Returns a JSON response with a JWT token, user data, and a success message if input is valid. Returns error messages for missing or invalid input.
+        """
         try:
             data, error_response, status_code = get_json_data()
             if error_response:

@@ -23,6 +23,9 @@ class InventoryForecastingModel:
     """
     
     def __init__(self):
+        """
+        Initialize the InventoryForecastingModel with a RandomForestRegressor, feature scaler, training status flag, feature names list, and file paths for model and scaler persistence.
+        """
         self.model = RandomForestRegressor(
             n_estimators=100,
             max_depth=10,
@@ -37,13 +40,12 @@ class InventoryForecastingModel:
     
     def prepare_features(self, data: pd.DataFrame) -> pd.DataFrame:
         """
-        Prepare features for inventory forecasting
+        Generates engineered features from raw sales and inventory data for use in inventory forecasting.
         
-        Args:
-            data: DataFrame with sales/inventory data
-            
+        The method augments the input DataFrame with time-based, sales history, price-related, inventory, category, and external factor features. Missing values are filled with zero.
+        
         Returns:
-            DataFrame with engineered features
+            pd.DataFrame: DataFrame containing the original and newly engineered features for forecasting.
         """
         features = data.copy()
         
@@ -91,14 +93,14 @@ class InventoryForecastingModel:
     
     def train(self, training_data: pd.DataFrame, target_column: str = 'future_demand') -> Dict:
         """
-        Train the inventory forecasting model
+        Trains the inventory forecasting model using historical data and returns training metrics and feature importances.
         
-        Args:
-            training_data: DataFrame with historical data
-            target_column: Name of the target variable
-            
+        Parameters:
+            training_data (pd.DataFrame): Historical sales and inventory data.
+            target_column (str): Name of the target variable to predict. Defaults to 'future_demand'.
+        
         Returns:
-            Training metrics
+            Dict: Dictionary containing training metrics (MAE, MSE, RMSE, R² score) and feature importances.
         """
         try:
             # Prepare features
@@ -146,14 +148,16 @@ class InventoryForecastingModel:
     
     def predict_demand(self, product_data: Dict, forecast_days: int = 30) -> Dict:
         """
-        Predict future demand for a product
+        Predicts future daily demand for a single product over a specified forecast period.
         
-        Args:
-            product_data: Product information and historical data
-            forecast_days: Number of days to forecast
-            
+        Generates demand forecasts for each day in the forecast horizon using the trained model, calculates confidence intervals, and provides summary statistics including total, average, and peak demand. Also computes recommended stock level with a buffer, reorder point, and analyzes demand trend.
+        
+        Parameters:
+            product_data (Dict): Dictionary containing product information and historical data.
+            forecast_days (int, optional): Number of days to forecast. Defaults to 30.
+        
         Returns:
-            Demand prediction results
+            Dict: Dictionary containing daily demand predictions, confidence intervals, summary metrics, recommended stock level, reorder point, and demand trend.
         """
         try:
             if not self.is_trained:
@@ -221,13 +225,15 @@ class InventoryForecastingModel:
     
     def optimize_inventory(self, products: List[Dict]) -> Dict:
         """
-        Optimize inventory levels for multiple products
+        Generates inventory optimization recommendations for a list of products based on predicted demand.
         
-        Args:
-            products: List of product data dictionaries
-            
+        For each product, forecasts demand, calculates recommended stock levels, and provides actionable restocking or reduction advice with priority scores and estimated costs. Returns a summary including all recommendations, total investment needed, high-priority items, and overall inventory status.
+        
+        Parameters:
+            products (List[Dict]): List of product data dictionaries to analyze.
+        
         Returns:
-            Optimization recommendations
+            Dict: Inventory optimization results containing recommendations, investment summary, high-priority items, and a summary report.
         """
         recommendations = []
         
@@ -261,7 +267,12 @@ class InventoryForecastingModel:
         }
     
     def _analyze_trend(self, predictions: List[float]) -> str:
-        """Analyze demand trend from predictions"""
+        """
+        Determines the demand trend by comparing the average predicted demand in the first and second halves of the forecast period.
+        
+        Returns:
+            str: 'increasing', 'decreasing', or 'stable' based on the relative change between the two halves.
+        """
         if len(predictions) < 2:
             return 'stable'
         
@@ -278,7 +289,16 @@ class InventoryForecastingModel:
             return 'stable'
     
     def _get_action_recommendation(self, current_stock: float, recommended_stock: float) -> str:
-        """Get action recommendation based on stock levels"""
+        """
+        Return an inventory action recommendation based on the ratio of current stock to recommended stock.
+        
+        Parameters:
+            current_stock (float): The current inventory level.
+            recommended_stock (float): The recommended inventory level.
+        
+        Returns:
+            str: One of 'urgent_restock', 'restock_soon', 'reduce_stock', or 'maintain' indicating the suggested inventory action.
+        """
         ratio = current_stock / (recommended_stock + 1)
         
         if ratio < 0.5:
@@ -291,7 +311,14 @@ class InventoryForecastingModel:
             return 'maintain'
     
     def _calculate_priority(self, product: Dict, demand_forecast: Dict) -> float:
-        """Calculate priority score for inventory action"""
+        """
+        Compute a priority score for inventory actions based on current stock, predicted demand, and demand trend.
+        
+        The score increases as the stock-to-demand ratio decreases and is further adjusted for increasing or decreasing demand trends. The maximum score is capped at 1.0.
+        
+        Returns:
+            float: Priority score between 0 and 1, where higher values indicate more urgent inventory action.
+        """
         # Base priority on stock ratio and demand trend
         current_stock = product.get('current_stock', 0)
         predicted_demand = demand_forecast['total_predicted_demand']
@@ -314,7 +341,18 @@ class InventoryForecastingModel:
         return min(priority, 1.0)
     
     def _estimate_cost(self, product: Dict, quantity_needed: float) -> float:
-        """Estimate cost for restocking"""
+        """
+        Estimate the total cost required to restock a product based on the quantity needed.
+        
+        If the product's unit cost is unavailable, estimates it as 60% of the product's price.
+        
+        Parameters:
+            product (Dict): Product information containing cost or price.
+            quantity_needed (float): Number of units to restock.
+        
+        Returns:
+            float: Estimated total restocking cost.
+        """
         if quantity_needed <= 0:
             return 0
         
@@ -322,7 +360,15 @@ class InventoryForecastingModel:
         return quantity_needed * unit_cost
     
     def _generate_summary(self, recommendations: List[Dict]) -> Dict:
-        """Generate summary of recommendations"""
+        """
+        Summarizes inventory recommendations by counting products needing urgent or total restock actions.
+        
+        Parameters:
+            recommendations (List[Dict]): List of product recommendation dictionaries, each containing an 'action' key.
+        
+        Returns:
+            Dict: Summary including total products analyzed, count of urgent and total restocks needed, and percentage requiring action.
+        """
         total_products = len(recommendations)
         urgent_items = len([r for r in recommendations if r['action'] == 'urgent_restock'])
         restock_items = len([r for r in recommendations if r['action'] in ['urgent_restock', 'restock_soon']])
@@ -335,7 +381,9 @@ class InventoryForecastingModel:
         }
     
     def save_model(self):
-        """Save the trained model and scaler"""
+        """
+        Persist the trained forecasting model and scaler to disk.
+        """
         try:
             joblib.dump(self.model, self.model_path)
             joblib.dump(self.scaler, self.scaler_path)
@@ -344,7 +392,11 @@ class InventoryForecastingModel:
             logger.error(f"Error saving model: {str(e)}")
     
     def load_model(self):
-        """Load a previously trained model"""
+        """
+        Loads a previously trained inventory forecasting model and scaler from disk if available.
+        
+        If the saved model and scaler files exist, they are loaded and the model is marked as trained. If not found, the method leaves the default model in place.
+        """
         try:
             if os.path.exists(self.model_path) and os.path.exists(self.scaler_path):
                 self.model = joblib.load(self.model_path)
@@ -359,14 +411,27 @@ class InventoryForecastingModel:
 # Utility functions for integration
 def get_inventory_predictions(products_data: List[Dict]) -> Dict:
     """
-    Convenience function to get inventory predictions
+    Generates inventory optimization recommendations for a list of products.
+    
+    Parameters:
+        products_data (List[Dict]): List of product data dictionaries to analyze.
+    
+    Returns:
+        Dict: Inventory optimization results including restocking recommendations, priority scores, estimated costs, and summary statistics.
     """
     model = InventoryForecastingModel()
     return model.optimize_inventory(products_data)
 
 def predict_single_product_demand(product_data: Dict, forecast_days: int = 30) -> Dict:
     """
-    Convenience function to predict demand for a single product
+    Predicts future demand for a single product over a specified forecast period.
+    
+    Parameters:
+        product_data (Dict): Dictionary containing product information and historical data.
+        forecast_days (int, optional): Number of days to forecast demand for. Defaults to 30.
+    
+    Returns:
+        Dict: Demand forecast results, including daily predictions, confidence intervals, summary statistics, and stock recommendations.
     """
     model = InventoryForecastingModel()
     return model.predict_demand(product_data, forecast_days)

@@ -29,6 +29,12 @@ users_db = {}
 
 @app.route('/api/v1/health', methods=['GET'])
 def health():
+    """
+    Return a JSON response indicating the backend server is healthy, including a status message and current timestamp.
+    
+    Returns:
+        tuple: A Flask response object with JSON data and HTTP status code 200.
+    """
     return jsonify({
         "status": "healthy", 
         "message": "RetailGenie Backend is running",
@@ -37,6 +43,10 @@ def health():
 
 @app.route('/api/v1/auth/register', methods=['POST', 'OPTIONS'])
 def register():
+    """
+    Handles retailer registration by validating input, creating a new user, and returning a mock JWT token and user details.
+    
+    Accepts POST requests with JSON containing `name`, `email`, and `password`. Returns errors for missing fields, invalid content type, or if the user already exists. On success, creates a new user with a unique ID, optional business name, and role "retailer", then returns a mock authentication token and user data. Handles CORS preflight OPTIONS requests.
     if request.method == 'OPTIONS':
         return '', 200
         
@@ -96,6 +106,11 @@ def register():
 
 @app.route('/api/v1/auth/login', methods=['POST', 'OPTIONS'])
 def login():
+    """
+    Handles user login requests by validating credentials and returning a mock JWT token and user data.
+    
+    Accepts POST requests with JSON containing `email` and `password`. Returns a JSON response with authentication status, a mock token, user details, and a message. Responds with appropriate error messages and status codes for invalid input or authentication failure.
+    """
     if request.method == 'OPTIONS':
         return '', 200
         
@@ -139,6 +154,11 @@ def login():
 
 @app.route('/api/v1/auth/profile', methods=['GET'])
 def profile():
+    """
+    Handles retrieval of the authenticated user's profile.
+    
+    Requires an Authorization header. Returns a mock user profile with fixed user details in JSON format. Responds with HTTP 401 if the Authorization header is missing.
+    """
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({"success": False, "error": "No authorization header"}), 401

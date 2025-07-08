@@ -16,6 +16,12 @@ CORS(app, origins=['http://localhost:3000'],
 
 @app.route("/", methods=["GET"])
 def root():
+    """
+    Handle GET requests to the root endpoint and return a JSON response indicating the API is running.
+    
+    Returns:
+        Response: A Flask JSON response with a message and status.
+    """
     return jsonify({
         "message": "Simple Test API",
         "status": "running"
@@ -23,6 +29,12 @@ def root():
 
 @app.route("/api/v1/health", methods=["GET"])
 def health():
+    """
+    Handle GET requests to the health check endpoint and return a JSON response indicating the API is healthy.
+    
+    Returns:
+        Response: A Flask JSON response with health status and a message.
+    """
     return jsonify({
         "status": "healthy",
         "message": "Simple API is running"
@@ -30,6 +42,12 @@ def health():
 
 @app.route("/api/v1/test", methods=["POST"])
 def test_post():
+    """
+    Handle POST requests to the test endpoint by parsing JSON data from the request body and returning a confirmation response.
+    
+    Returns:
+        Response: A JSON object indicating success and echoing the received data, or an error message with HTTP status 500 if parsing fails.
+    """
     try:
         data = request.get_json()
         return jsonify({

@@ -16,11 +16,29 @@ app = Flask(__name__)
 CORS(app)
 
 def create_success_response(data):
-    """Create success response"""
+    """
+    Create a standardized JSON response indicating a successful operation.
+    
+    Parameters:
+        data: The data payload to include in the response.
+    
+    Returns:
+        A Flask JSON response object with a success flag and the provided data.
+    """
     return jsonify({"success": True, "data": data})
 
 def create_error_response(message, status_code, path):
-    """Create error response"""
+    """
+    Create a standardized JSON error response with a message, HTTP status code, and request path.
+    
+    Parameters:
+        message (str): Description of the error.
+        status_code (int): HTTP status code to include in the response.
+        path (str): The request path where the error occurred.
+    
+    Returns:
+        Response: Flask JSON response object indicating failure and error details.
+    """
     return jsonify({
         "success": False,
         "error": {
@@ -32,7 +50,11 @@ def create_error_response(message, status_code, path):
 
 @app.route("/api/v1/ml/sentiment/analysis", methods=["GET"])
 def get_sentiment_analysis():
-    """Get sentiment analysis of customer feedback"""
+    """
+    Handles the GET request for sentiment analysis of a batch of mock customer feedback texts.
+    
+    Performs sentiment analysis using a machine learning model, returning overall sentiment, sentiment distribution, trending topics, average confidence, total feedback count, and a generation timestamp in a structured JSON response. Returns an error response with status 500 if analysis fails.
+    """
     try:
         # Import ML model
         from ml_models.sentiment_analysis.sentiment_model import SentimentAnalyzer
@@ -83,7 +105,12 @@ def get_sentiment_analysis():
 
 @app.route("/api/v1/ml/inventory/forecast", methods=["GET"])
 def get_inventory_forecast():
-    """Get inventory demand forecasting"""
+    """
+    Handles the GET request for inventory demand forecasting and returns mock prediction data for multiple products.
+    
+    Returns:
+        A JSON response containing predicted demand, trend, confidence score, current stock, and reorder recommendation for each product, along with a generation timestamp.
+    """
     try:
         # Mock inventory data and predictions
         predictions = {
@@ -103,7 +130,14 @@ def get_inventory_forecast():
 
 @app.route("/api/v1/analytics", methods=["GET"])
 def get_analytics():
-    """Get analytics data"""
+    """
+    Return mock analytics data for a specified time range, including revenue, orders, customer metrics, sales trends, top products, category distribution, and customer segments.
+    
+    The time range can be specified via the `time_range` query parameter; defaults to "week" if not provided.
+    
+    Returns:
+        Response: JSON response containing analytics data and a generation timestamp.
+    """
     try:
         time_range = request.args.get("time_range", "week")
         
@@ -156,7 +190,9 @@ def get_analytics():
 
 @app.route("/health", methods=["GET"])
 def health_check():
-    """Health check endpoint"""
+    """
+    Returns the health status of the server with the current UTC timestamp.
+    """
     return jsonify({"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()})
 
 if __name__ == "__main__":

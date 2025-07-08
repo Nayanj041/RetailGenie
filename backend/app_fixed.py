@@ -22,7 +22,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def create_fixed_app():
-    """Create fixed Flask app with working authentication"""
+    """
+    Create and configure a Flask application providing authentication and product endpoints with Firebase integration.
+    
+    This function sets up a Flask app with CORS support for local and GitHub Codespaces origins, initializes Firebase utilities, and registers routes for user registration, login, health checks, and product retrieval. It also configures JWT-based authentication and custom error handlers for 404 and 500 responses.
+    
+    Returns:
+        app (Flask): A configured Flask application instance ready to run.
+    """
     app = Flask(__name__)
     
     # Configuration
@@ -51,7 +58,15 @@ def create_fixed_app():
     firebase = FirebaseUtils()
     
     def generate_jwt_token(user_data):
-        """Generate JWT token for user"""
+        """
+        Generate a JWT token containing user ID, email, role, and a 24-hour expiration.
+        
+        Parameters:
+            user_data (dict): Dictionary containing user information, including 'id', 'email', and optionally 'role'.
+        
+        Returns:
+            str: Encoded JWT token as a string.
+        """
         payload = {
             'user_id': user_data.get('id'),
             'email': user_data.get('email'),
@@ -62,6 +77,9 @@ def create_fixed_app():
     
     @app.route("/", methods=["GET"])
     def root():
+        """
+        Return a JSON response with API information, current status, version, and available endpoints.
+        """
         return jsonify({
             "message": "RetailGenie Fixed Authentication API",
             "version": "1.0.0",
@@ -76,6 +94,9 @@ def create_fixed_app():
     
     @app.route("/api/v1/health", methods=["GET"])
     def health():
+        """
+        Return a JSON response indicating the health status of the authentication service, including a timestamp and Firebase connection status.
+        """
         return jsonify({
             "status": "healthy",
             "message": "RetailGenie Authentication Service",
@@ -85,7 +106,12 @@ def create_fixed_app():
     
     @app.route("/api/v1/auth/register", methods=["POST", "OPTIONS"])
     def register():
-        """Fixed user registration endpoint"""
+        """
+        Handles user registration by validating input, checking for existing users, hashing the password, creating a new retailer user in Firebase, and returning a JWT token and user data on success.
+        
+        Returns:
+            Response: A JSON response indicating success or failure, with a JWT token and user information on successful registration.
+        """
         if request.method == "OPTIONS":
             return jsonify({"status": "ok"}), 200
             
@@ -188,7 +214,12 @@ def create_fixed_app():
     
     @app.route("/api/v1/auth/login", methods=["POST", "OPTIONS"])
     def login():
-        """Fixed user login endpoint"""
+        """
+        Handles user login by validating credentials, verifying the user against stored records, and issuing a JWT token upon successful authentication.
+        
+        Returns:
+            JSON response containing a success flag, message, JWT token, and user information (excluding password) on successful login, or an error message with appropriate HTTP status code on failure.
+        """
         if request.method == "OPTIONS":
             return jsonify({"status": "ok"}), 200
             
@@ -273,7 +304,12 @@ def create_fixed_app():
     
     @app.route("/api/v1/products", methods=["GET"])
     def get_products():
-        """Sample products endpoint"""
+        """
+        Retrieve the list of products from Firebase, or return sample products if none are found.
+        
+        Returns:
+            A Flask JSON response containing a success flag, product data, and product count on success, or an error message on failure.
+        """
         try:
             products = firebase.get_documents("products") or []
             
@@ -311,6 +347,12 @@ def create_fixed_app():
     
     @app.errorhandler(404)
     def not_found(error):
+        """
+        Handle 404 Not Found errors by returning a JSON response with an error message and a list of available API endpoints.
+        
+        Returns:
+            A tuple containing a JSON response and the HTTP 404 status code.
+        """
         return jsonify({
             "success": False,
             "message": "Endpoint not found",
@@ -325,6 +367,9 @@ def create_fixed_app():
     
     @app.errorhandler(500)
     def internal_error(error):
+        """
+        Handles uncaught internal server errors by returning a standardized JSON response with a 500 status code.
+        """
         logger.error(f"Internal server error: {str(error)}")
         return jsonify({
             "success": False,

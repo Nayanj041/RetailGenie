@@ -13,7 +13,12 @@ BACKEND_URL = "http://localhost:5000"
 FRONTEND_URL = "http://localhost:3000"
 
 def test_backend_health():
-    """Test if backend is healthy"""
+    """
+    Checks the health status of the backend service by sending a request to its health endpoint.
+    
+    Returns:
+        bool: True if the backend responds successfully; False if the request fails or an error occurs.
+    """
     try:
         response = requests.get(f"{BACKEND_URL}/api/v1/health", timeout=5)
         print(f"✅ Backend Health: {response.status_code}")
@@ -24,7 +29,12 @@ def test_backend_health():
         return False
 
 def test_registration():
-    """Test user registration"""
+    """
+    Attempts to register a new demo user with the backend authentication service.
+    
+    Returns:
+        dict or None: The response JSON containing user details and token if registration is successful; otherwise, None.
+    """
     try:
         user_data = {
             "email": f"demo{int(time.time())}@retailgenie.com",
@@ -55,7 +65,16 @@ def test_registration():
         return None
 
 def test_login(email="demo@retailgenie.com", password="demo123456"):
-    """Test user login"""
+    """
+    Attempts to log in a user with the provided email and password.
+    
+    Parameters:
+        email (str): The user's email address. Defaults to the demo user.
+        password (str): The user's password. Defaults to the demo password.
+    
+    Returns:
+        dict or None: The response JSON containing user and token information if login is successful; otherwise, None.
+    """
     try:
         login_data = {
             "email": email,
@@ -84,7 +103,15 @@ def test_login(email="demo@retailgenie.com", password="demo123456"):
         return None
 
 def test_authenticated_request(token):
-    """Test authenticated API request"""
+    """
+    Send an authenticated GET request to the products endpoint using the provided token.
+    
+    Parameters:
+        token (str): Bearer token for authentication.
+    
+    Returns:
+        bool: True if the request succeeds with HTTP 200, otherwise False.
+    """
     try:
         headers = {
             "Authorization": f"Bearer {token}",
@@ -111,7 +138,12 @@ def test_authenticated_request(token):
         return False
 
 def test_frontend_backend_flow():
-    """Complete frontend-backend authentication flow test"""
+    """
+    Runs the complete authentication flow, including backend health check, user registration, login, and an authenticated API request.
+    
+    Returns:
+        bool: True if the flow completes; False if the backend health check fails.
+    """
     print("🧪 Testing Complete Authentication Flow")
     print("=" * 60)
     
@@ -146,7 +178,9 @@ def test_frontend_backend_flow():
     return True
 
 def create_frontend_config():
-    """Create frontend configuration file"""
+    """
+    Generate the frontend API configuration file with backend endpoints and CORS settings for the RetailGenie application.
+    """
     config = {
         "apiBaseUrl": BACKEND_URL,
         "apiVersion": "v1",

@@ -22,7 +22,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def create_complete_app():
-    """Create complete Flask app with all features"""
+    """
+    Create and configure a Flask application instance with authentication, product management, analytics, AI chat, and feedback endpoints for the RetailGenie backend.
+    
+    The app integrates Firebase for data storage, sets up JWT-based authentication, configures CORS with dynamic origins, and registers all API routes and error handlers. Returns the fully initialized Flask app ready for deployment.
+    """
     app = Flask(__name__)
     
     # Configuration
@@ -52,7 +56,15 @@ def create_complete_app():
     
     # JWT helper functions
     def generate_jwt_token(user_data):
-        """Generate JWT token for user"""
+        """
+        Generate a JWT token containing user ID, email, role, and an expiration date set to 7 days from issuance.
+        
+        Parameters:
+            user_data (dict): Dictionary containing user information, including 'id' and 'email'.
+        
+        Returns:
+            str: Encoded JWT token as a string.
+        """
         payload = {
             'user_id': user_data['id'],
             'email': user_data['email'],
@@ -62,7 +74,12 @@ def create_complete_app():
         return jwt.encode(payload, app.config['JWT_SECRET'], algorithm='HS256')
     
     def verify_jwt_token(token):
-        """Verify JWT token"""
+        """
+        Verifies a JWT token and returns its payload if valid.
+        
+        Returns:
+            dict or None: The decoded token payload if verification succeeds; otherwise, None if the token is expired or invalid.
+        """
         try:
             payload = jwt.decode(token, app.config['JWT_SECRET'], algorithms=['HS256'])
             return payload
@@ -74,7 +91,9 @@ def create_complete_app():
     # Routes
     @app.route('/', methods=['GET'])
     def home():
-        """API information and available endpoints"""
+        """
+        Return API status information and a list of available endpoints for the RetailGenie backend.
+        """
         return jsonify({
             'message': 'RetailGenie Complete API',
             'status': 'running',
@@ -92,7 +111,11 @@ def create_complete_app():
     
     @app.route('/api/v1/health', methods=['GET'])
     def health_check():
-        """Health check endpoint"""
+        """
+        Checks the health status of the service and Firebase connectivity.
+        
+        Returns a JSON response indicating service health, Firebase connection status, and the current timestamp. Responds with a 500 status code if an error occurs.
+        """
         try:
             firebase_status = firebase.db is not None
             
@@ -112,7 +135,12 @@ def create_complete_app():
     
     @app.route('/api/v1/auth/register', methods=['POST'])
     def register():
-        """User registration endpoint"""
+        """
+        Handles user registration by validating input, checking for existing users, creating a new user record in Firebase, and returning a JWT token and user data on success.
+        
+        Returns:
+            JSON response indicating success or failure, including a JWT token and user information (excluding password) if registration is successful.
+        """
         try:
             data = request.get_json()
             
@@ -169,7 +197,11 @@ def create_complete_app():
     
     @app.route('/api/v1/auth/login', methods=['POST'])
     def login():
-        """User login endpoint"""
+        """
+        Authenticates a user with email and password, returning a JWT token and user data on success.
+        
+        Validates credentials against stored user records in Firebase. On successful authentication, updates the user's last login timestamp and returns a JWT token along with user information (excluding the password). Returns appropriate error responses for missing fields, invalid credentials, or internal errors.
+        """
         try:
             data = request.get_json()
             
@@ -217,7 +249,12 @@ def create_complete_app():
     
     @app.route('/api/v1/products', methods=['GET'])
     def get_products():
-        """Get all products"""
+        """
+        Retrieve all products from the database and return them as a JSON response.
+        
+        Returns:
+            JSON response containing a list of all products, each with its unique ID, and the total count. Returns an error response with status 500 if retrieval fails.
+        """
         try:
             products_ref = firebase.db.collection('products')
             products = []
@@ -239,7 +276,12 @@ def create_complete_app():
     
     @app.route('/api/v1/analytics', methods=['GET'])
     def get_analytics():
-        """Get analytics data for dashboard"""
+        """
+        Return mock analytics data for the dashboard, including revenue, orders, customer segments, sales trends, and top products.
+        
+        Returns:
+            Response: JSON object containing analytics metrics for the specified time range (default is "week").
+        """
         try:
             time_range = request.args.get('time_range', 'week')
             
@@ -293,7 +335,12 @@ def create_complete_app():
     
     @app.route('/api/v1/ai/chat', methods=['POST'])
     def ai_chat():
-        """AI chat assistant endpoint"""
+        """
+        Handles AI chat requests by analyzing user messages and returning context-aware responses for product search, pricing, recommendations, or general assistance.
+        
+        Returns:
+            JSON response containing AI-generated text, detected intent, and relevant suggestions or product recommendations.
+        """
         try:
             data = request.get_json()
             
@@ -339,7 +386,12 @@ def create_complete_app():
     
     @app.route('/api/v1/feedback', methods=['GET'])
     def get_feedback():
-        """Get customer feedback with sentiment analysis"""
+        """
+        Return mock customer feedback data with sentiment analysis results.
+        
+        Returns:
+            JSON response containing a list of feedback entries with sentiment labels and scores, as well as summary statistics for sentiment distribution and average rating.
+        """
         try:
             # Mock feedback data (in production, get from Firebase and run sentiment analysis)
             feedback_data = {
@@ -393,6 +445,12 @@ def create_complete_app():
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
+        """
+        Handle 404 errors by returning a JSON response with a failure message and a list of available API endpoints.
+        
+        Returns:
+            A tuple containing a JSON response and the HTTP 404 status code.
+        """
         return jsonify({
             'success': False,
             'message': 'Endpoint not found',
@@ -410,6 +468,9 @@ def create_complete_app():
     
     @app.errorhandler(500)
     def internal_error(error):
+        """
+        Handles uncaught server errors by returning a standardized JSON response with a 500 status code.
+        """
         return jsonify({
             'success': False,
             'message': 'Internal server error'
