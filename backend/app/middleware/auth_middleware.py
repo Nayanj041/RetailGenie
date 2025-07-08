@@ -88,8 +88,10 @@ class AuthMiddleware:
             # Handle Bearer token
             if auth_header.startswith("Bearer "):
                 token = auth_header.split(" ")[1]
+                # Use the JWT secret with fallback
+                jwt_secret = current_app.config.get("JWT_SECRET_KEY") or self.jwt_secret
                 payload = jwt.decode(
-                    token, current_app.config["JWT_SECRET_KEY"], algorithms=["HS256"]
+                    token, jwt_secret, algorithms=["HS256"]
                 )
 
                 # Check token expiration
@@ -117,6 +119,9 @@ class AuthMiddleware:
         except jwt.InvalidTokenError as e:
             current_app.logger.warning(f"Invalid JWT token: {e}")
             return jsonify({"error": "Invalid token"}), 401
+        except KeyError as e:
+            current_app.logger.error(f"Missing config key: {e}. Check JWT_SECRET_KEY environment variable.")
+            return jsonify({"error": "Server configuration error"}), 500
         except Exception as e:
             current_app.logger.error(f"Auth middleware error: {e}")
             return jsonify({"error": "Authentication failed"}), 500

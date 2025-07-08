@@ -15,7 +15,7 @@ class BaseConfig:
 
     # Flask settings
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
-    JWT_SECRET = os.environ.get("JWT_SECRET", "dev-jwt-secret-change-in-production")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "jwt-secret-key-change-in-production")
 
     # Firebase configuration
     FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID", "retailgenie-demo")

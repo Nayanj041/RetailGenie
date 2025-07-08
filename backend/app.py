@@ -89,7 +89,7 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
-    app.config['JWT_SECRET'] = os.getenv('JWT_SECRET', 'dev-jwt-secret')
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
     app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
     # CORS configuration - Allow frontend connection
@@ -228,7 +228,7 @@ def create_app():
                 if token.startswith('Bearer '):
                     token = token[7:]
                 
-                payload = jwt.decode(token, app.config['JWT_SECRET'], algorithms=['HS256'])
+                payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
                 request.user = payload
                 return f(*args, **kwargs)
             except jwt.ExpiredSignatureError:
@@ -247,7 +247,7 @@ def create_app():
             'role': user_data.get('role', 'user'),
             'exp': datetime.utcnow() + timedelta(hours=24)
         }
-        return jwt.encode(payload, app.config['JWT_SECRET'], algorithm='HS256')
+        return jwt.encode(payload, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
     def get_json_data():
         """Safely get JSON data from request"""

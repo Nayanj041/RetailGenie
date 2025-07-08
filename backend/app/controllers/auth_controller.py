@@ -15,7 +15,7 @@ class AuthController:
     def __init__(self):
         self.firebase = FirebaseUtils()
         self.collection_name = "users"
-        self.secret_key = os.getenv("JWT_SECRET", "your-secret-key-here")
+        self.secret_key = os.getenv("JWT_SECRET_KEY", "jwt-secret-key-change-in-production")
 
     def register_user(self, user_data):
         """
