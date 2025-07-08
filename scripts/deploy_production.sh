@@ -76,7 +76,7 @@ echo "1. Render: Use render.yaml configuration"
 echo "2. Heroku: git push heroku main"
 echo "3. Google Cloud: gcloud app deploy"
 echo "4. Docker: docker run -p 5000:5000 --env-file .env retailgenie-backend:latest"
-echo "5. Manual: gunicorn --bind 0.0.0.0:5000 --workers 4 app_versioned:app"
+echo "5. Manual: gunicorn --bind 0.0.0.0:5000 --workers 4 app:app"
 
 echo ""
 echo "✅ RetailGenie Backend is ready for production deployment!"
@@ -90,5 +90,5 @@ if [ "$1" = "test" ]; then
     echo "🔥 Starting local production server for testing..."
     export FLASK_ENV=production
     export FLASK_DEBUG=False
-    gunicorn --bind 0.0.0.0:5000 --workers 2 app_versioned:app
+    gunicorn --bind 0.0.0.0:5000 --workers 2 app:app
 fi

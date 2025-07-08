@@ -639,14 +639,7 @@ def create_app():
             logger.error(f"Registration error: {str(e)}")
             return jsonify({"success": False, "error": str(e)}), 500
 
-    # Import all endpoint patterns from app_endpoints.py
-    # try:
-    #     from app_endpoints import add_all_advanced_endpoints
-    #     add_all_advanced_endpoints(app, firebase, controllers, require_auth, get_json_data, logger, generate_jwt_token)
-    #     logger.info("✅ All advanced endpoints loaded successfully")
-    # except Exception as e:
-    #     logger.warning(f"❌ Advanced endpoints import failed: {e}")
-    #     # Endpoints will use fallback implementations defined inline
+
     
     # ===== ADVANCED ENDPOINTS (INLINE IMPLEMENTATION) =====
     

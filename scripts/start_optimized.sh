@@ -109,4 +109,4 @@ echo "🔄 Server starting in 3 seconds..."
 sleep 3
 
 # Start the optimized server
-$PYTHON_CMD app_optimized.py
+$PYTHON_CMD app.py

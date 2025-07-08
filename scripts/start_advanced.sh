@@ -130,7 +130,7 @@ trap cleanup SIGINT SIGTERM
 
 # Start services in background
 echo -e "${GREEN}🚀 Starting Main API Server (Port 5000)...${NC}"
-$PYTHON_CMD app_optimized.py > logs/api.log 2>&1 &
+$PYTHON_CMD app.py > logs/api.log 2>&1 &
 API_PID=$!
 
 sleep 2

@@ -7,7 +7,7 @@ echo "🔧 Fixing datetime deprecation warnings..."
 files=(
     "backend/api_versions/v1.py"
     "backend/api_versions/v2.py"
-    "backend/app_versioned.py"
+    "backend/app.py"
     "backend/app.py"
 )
 
