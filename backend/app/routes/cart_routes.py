@@ -14,12 +14,11 @@ cart_bp = Blueprint('cart', __name__)
 cart_controller = CartController()
 
 @cart_bp.route('', methods=['GET'])
-@require_auth
 def get_cart():
     """Get user's cart items"""
     try:
         user = getattr(request, 'current_user', {})
-        user_id = user.get('user_id', 'sample_user')
+        user_id = user.get('user_id', 'guest_user')
         
         result = cart_controller.get_cart(user_id)
         
@@ -43,7 +42,6 @@ def get_cart():
         }), 500
 
 @cart_bp.route('/add', methods=['POST'])
-@require_auth
 def add_to_cart():
     """Add item to cart"""
     try:
@@ -57,8 +55,9 @@ def add_to_cart():
                 "error": "Product ID is required"
             }), 400
         
+        # Check if user is authenticated, fallback to guest user
         user = getattr(request, 'current_user', {})
-        user_id = user.get('user_id', 'sample_user')
+        user_id = user.get('user_id', 'guest_user')
         
         # Sample response
         response_data = {

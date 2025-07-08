@@ -65,6 +65,14 @@ class AuthMiddleware:
                 "/api/v1/ai/chat",
                 "/api/v1/dashboard/stats",
                 "/api/v1/analytics/dashboard",
+                "/api/v1/cart",
+                "/api/v1/cart/add",
+                "/api/v1/wishlist",
+                "/api/v1/wishlist/add",
+                "/api/v1/products",
+                "/api/v1/feedback",
+                "/api/v1/feedback/sentiment",
+                "/api/v1/analytics",
             ]
 
             if request.endpoint in exempt_endpoints or request.path in exempt_paths:

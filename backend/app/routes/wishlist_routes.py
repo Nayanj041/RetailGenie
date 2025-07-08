@@ -14,12 +14,11 @@ wishlist_bp = Blueprint('wishlist', __name__)
 wishlist_controller = WishlistController()
 
 @wishlist_bp.route('', methods=['GET'])
-@require_auth
 def get_wishlist():
     """Get user's wishlist items"""
     try:
         user = getattr(request, 'current_user', {})
-        user_id = user.get('user_id', 'sample_user')
+        user_id = user.get('user_id', 'guest_user')
         
         # Sample wishlist data for demonstration
         sample_wishlist = {
@@ -72,7 +71,6 @@ def get_wishlist():
         }), 500
 
 @wishlist_bp.route('/add', methods=['POST'])
-@require_auth
 def add_to_wishlist():
     """Add item to wishlist"""
     try:
@@ -85,8 +83,9 @@ def add_to_wishlist():
                 "error": "Product ID is required"
             }), 400
         
+        # Check if user is authenticated, fallback to guest user
         user = getattr(request, 'current_user', {})
-        user_id = user.get('user_id', 'sample_user')
+        user_id = user.get('user_id', 'guest_user')
         
         # Sample response
         response_data = {

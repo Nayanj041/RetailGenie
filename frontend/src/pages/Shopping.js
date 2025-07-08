@@ -79,17 +79,10 @@ const Shopping = () => {
 
   const addToCart = async (productId, quantity = 1) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await api.post(
-        "/api/v1/cart/add",
-        {
-          product_id: productId,
-          quantity,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await api.post("/api/v1/cart/add", {
+        product_id: productId,
+        quantity,
+      });
       
       if (response.data?.success || response.success) {
         toast.success("Product added to cart!");
@@ -105,16 +98,9 @@ const Shopping = () => {
 
   const addToWishlist = async (productId) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await api.post(
-        "/api/v1/wishlist/add",
-        {
-          product_id: productId,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await api.post("/api/v1/wishlist/add", {
+        product_id: productId,
+      });
       
       if (response.data?.success || response.success) {
         toast.success("Product added to wishlist!");
