@@ -54,7 +54,7 @@ class Config:
     PDF_OUTPUT_DIR = os.environ.get("PDF_OUTPUT_DIR", "reports")
 
     # CORS Configuration
-    CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "https://retailgenie-1.onrender.com").split(",")
+    CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,https://retailgenie-1.onrender.com").split(",")
 
     # Pagination Configuration
     DEFAULT_PAGE_SIZE = 20
