@@ -1,0 +1,24 @@
+# ML Model Requirements - Enhanced for Full Feature Set
+numpy
+pandas
+scikit-learn
+scipy
+nltk
+tensorflow
+torch
+transformers
+matplotlib
+seaborn
+plotly
+statsmodels
+prophet
+joblib
+textblob
+xgboost
+lightgbm
+catboo
+spacy
+feature-engine
+shap
+lime
+mlflow
