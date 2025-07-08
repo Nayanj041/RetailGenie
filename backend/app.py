@@ -249,6 +249,20 @@ def create_app():
     except Exception as e:
         logger.warning(f"❌ Pricing blueprint registration failed: {e}")
 
+    try:
+        from app.routes.cart_routes import cart_bp
+        app.register_blueprint(cart_bp, url_prefix="/api/v1/cart")
+        logger.info("✅ Cart blueprint registered at /api/v1/cart")
+    except Exception as e:
+        logger.warning(f"❌ Cart blueprint registration failed: {e}")
+
+    try:
+        from app.routes.wishlist_routes import wishlist_bp
+        app.register_blueprint(wishlist_bp, url_prefix="/api/v1/wishlist")
+        logger.info("✅ Wishlist blueprint registered at /api/v1/wishlist")
+    except Exception as e:
+        logger.warning(f"❌ Wishlist blueprint registration failed: {e}")
+
     # ===== MIDDLEWARE & UTILITY FUNCTIONS =====
     
     def require_auth(f):
@@ -1514,20 +1528,6 @@ def create_app():
                                 "neutral": 30,
                                 "negative": 25
                             },
-                            "trending_topics": [
-                                {"topic": "product quality", "sentiment": "positive", "mentions": 15},
-                                {"topic": "customer service", "sentiment": "neutral", "mentions": 12},
-                                {"topic": "delivery", "sentiment": "negative", "mentions": 8}
-                            ],
-                            "confidence": 0.78
-                        },
-                        "total_feedback": 100,
-                        "generated_at": datetime.now(timezone.utc).isoformat(),
-                        "mode": "fallback"
-                    }
-                }), 200
-                
-        except Exception as e:
                             trend = "up"
                             confidence = 0.75
                         else:
