@@ -1,12 +1,5 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, Store, Building, Phone } from 'lucide-react';
-import { useAuth } from '../utils/AuthContext';
-import LoadingSpinner from '../components/LoadingSpinner';
-=======
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Eye,
   EyeOff,
@@ -19,7 +12,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "../utils/AuthContext";
 import LoadingSpinner from "../components/LoadingSpinner";
->>>>>>> d39c6b6e (ci/cd resolve)
 
 const Register = () => {
   const [formData, setFormData] = useState({
