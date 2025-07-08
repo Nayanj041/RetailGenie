@@ -94,10 +94,20 @@ export function AuthProvider({ children }) {
       console.log("📝 Login response data:", data);
 
       if (response.ok && data.success) {
-        localStorage.setItem("token", data.token);
-        setUser(data.user);
-        toast.success("Login successful!");
-        return { success: true };
+        // Handle nested data structure from backend
+        const token = data.data?.token || data.token;
+        const user = data.data?.user || data.user;
+        
+        if (token && user) {
+          localStorage.setItem("token", token);
+          setUser(user);
+          toast.success("Login successful!");
+          return { success: true };
+        } else {
+          console.error("❌ Missing token or user data in response:", data);
+          toast.error("Login response missing required data");
+          return { success: false, error: "Invalid response format" };
+        }
       } else {
         toast.error(data.message || "Login failed");
         return { success: false, error: data.message };
@@ -145,10 +155,20 @@ export function AuthProvider({ children }) {
       console.log("📝 Registration response data:", data);
 
       if (response.ok && data.success) {
-        localStorage.setItem("token", data.token);
-        setUser(data.user);
-        toast.success("Registration successful!");
-        return { success: true };
+        // Handle nested data structure from backend
+        const token = data.data?.token || data.token;
+        const user = data.data?.user || data.user;
+        
+        if (token && user) {
+          localStorage.setItem("token", token);
+          setUser(user);
+          toast.success("Registration successful!");
+          return { success: true };
+        } else {
+          console.error("❌ Missing token or user data in registration response:", data);
+          toast.error("Registration response missing required data");
+          return { success: false, error: "Invalid response format" };
+        }
       } else {
         const errorMessage =
           data.error || data.message || "Registration failed";

@@ -16,6 +16,7 @@ from flask import Flask
 from flask_cors import CORS
 import logging
 from datetime import datetime
+from flask import jsonify
 
 # Import configuration
 from config.config import Config
@@ -168,6 +169,52 @@ def create_app(config_class=Config):
             }
         except Exception as e:
             return {"error": str(e)}, 500
+
+    # Demo user seeding endpoint
+    @app.route("/api/v1/seed-demo-user", methods=["POST", "GET"])
+    def seed_demo_user():
+        """Create demo user for testing"""
+        try:
+            from app.controllers.auth_controller import AuthController
+            auth_controller = AuthController()
+            
+            # Demo user data
+            demo_data = {
+                "name": "Demo User",
+                "email": "demo@retailgenie.com", 
+                "password": "demo123456",
+                "business_name": "Demo Store",
+                "role": "retailer"
+            }
+            
+            # Check if demo user already exists
+            existing_users = auth_controller.firebase.query_documents(
+                "users", "email", "==", demo_data["email"]
+            )
+            
+            if existing_users:
+                return jsonify({
+                    "success": True,
+                    "message": "Demo user already exists",
+                    "user": {"email": demo_data["email"], "name": demo_data["name"]}
+                }), 200
+            
+            # Create demo user
+            result = auth_controller.register_user(demo_data)
+            
+            return jsonify({
+                "success": True,
+                "message": "Demo user created successfully",
+                "user": result["user"]
+            }), 201
+            
+        except Exception as e:
+            app.logger.error(f"Demo user seeding error: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": str(e),
+                "message": "Failed to create demo user"
+            }), 500
 
     # Error handlers
     @app.errorhandler(404)
