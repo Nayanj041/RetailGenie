@@ -214,6 +214,41 @@ def create_app():
     except Exception as e:
         logger.warning(f"❌ Feedback blueprint registration failed: {e}")
 
+    try:
+        from app.routes.auth_routes import auth_bp
+        app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
+        logger.info("✅ Auth blueprint registered at /api/v1/auth")
+    except Exception as e:
+        logger.warning(f"❌ Auth blueprint registration failed: {e}")
+
+    try:
+        from app.routes.product_routes import product_bp
+        app.register_blueprint(product_bp, url_prefix="/api/v1/products")
+        logger.info("✅ Product blueprint registered at /api/v1/products")
+    except Exception as e:
+        logger.warning(f"❌ Product blueprint registration failed: {e}")
+
+    try:
+        from app.routes.inventory_routes import inventory_bp
+        app.register_blueprint(inventory_bp, url_prefix="/api/v1/inventory")
+        logger.info("✅ Inventory blueprint registered at /api/v1/inventory")
+    except Exception as e:
+        logger.warning(f"❌ Inventory blueprint registration failed: {e}")
+
+    try:
+        from app.routes.ai_assistant_routes import ai_bp
+        app.register_blueprint(ai_bp, url_prefix="/api/v1/ai")
+        logger.info("✅ AI Assistant blueprint registered at /api/v1/ai")
+    except Exception as e:
+        logger.warning(f"❌ AI Assistant blueprint registration failed: {e}")
+
+    try:
+        from app.routes.pricing_routes import pricing_bp
+        app.register_blueprint(pricing_bp, url_prefix="/api/v1/pricing")
+        logger.info("✅ Pricing blueprint registered at /api/v1/pricing")
+    except Exception as e:
+        logger.warning(f"❌ Pricing blueprint registration failed: {e}")
+
     # ===== MIDDLEWARE & UTILITY FUNCTIONS =====
     
     def require_auth(f):
@@ -1493,41 +1528,6 @@ def create_app():
                 }), 200
                 
         except Exception as e:
-            logger.error(f"Error in sentiment analysis: {str(e)}")
-            return jsonify({"success": False, "error": str(e)}), 500
-
-    @app.route("/api/v1/ml/inventory/forecast", methods=["GET"])
-    def get_inventory_forecast():
-        """Get inventory demand forecasting"""
-        try:
-            # Import ML model
-            import sys
-            import os
-            sys.path.append(os.path.join(os.path.dirname(__file__), 'ml_models'))
-            
-            try:
-                from inventory_forecasting.forecast_model import InventoryForecastingModel
-                
-                # Initialize forecasting model
-                forecaster = InventoryForecastingModel()
-                
-                # Get inventory data from database
-                try:
-                    inventory_docs = firebase.get_documents("inventory") or firebase.get_documents("products") or []
-                    
-                    # Generate predictions for each product
-                    predictions = {}
-                    for item in inventory_docs:
-                        product_id = item.get('id', str(item.get('product_id', '')))
-                        current_stock = item.get('quantity', 0)
-                        
-                        # Simple prediction logic (in production, use trained model)
-                        if current_stock > 50:
-                            predicted_demand = max(5, int(current_stock * 0.1))
-                            trend = "stable"
-                            confidence = 0.85
-                        elif current_stock > 20:
-                            predicted_demand = max(10, int(current_stock * 0.2))
                             trend = "up"
                             confidence = 0.75
                         else:
