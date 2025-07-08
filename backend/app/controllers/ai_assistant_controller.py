@@ -21,23 +21,27 @@ class AIAssistantController:
         self.chat_collection = "chat_history"
         self.products_collection = "products"
         self.coupons_collection = "coupons"
-        
+
         # Initialize Google Gemini with error handling
         self.gemini_model = None
         self._initialize_gemini()
-        
+
     def _initialize_gemini(self):
         """Initialize Gemini with proper error handling"""
         try:
             gemini_api_key = os.getenv("GEMINI_API_KEY")
             if gemini_api_key:
                 genai.configure(api_key=gemini_api_key)
-                self.gemini_model = genai.GenerativeModel(os.getenv("GEMINI_MODEL", "gemini-pro"))
+                self.gemini_model = genai.GenerativeModel(
+                    os.getenv("GEMINI_MODEL", "gemini-pro")
+                )
                 logger.info("Gemini AI initialized successfully")
             else:
                 logger.warning("Gemini API key not found - AI features will be limited")
         except Exception as e:
-            logger.warning(f"Failed to initialize Gemini AI: {str(e)} - AI features will be limited")
+            logger.warning(
+                f"Failed to initialize Gemini AI: {str(e)} - AI features will be limited"
+            )
             self.gemini_model = None
             self.gemini_model = None
             logger.warning("Gemini API key not configured")
@@ -346,7 +350,9 @@ class AIAssistantController:
 
             # Generate AI-powered response
             if len(products) > 0:
-                response_text = f"I found {len(products)} products that match your search"
+                response_text = (
+                    f"I found {len(products)} products that match your search"
+                )
                 if self.gemini_model:
                     # Use Gemini to generate a more natural response
                     ai_response = self._generate_search_response(message, products[:3])
@@ -362,7 +368,7 @@ class AIAssistantController:
                 "products": products[:5],
                 "actions": ["show_products"],
                 "search_terms": search_terms,
-                "total_found": len(products)
+                "total_found": len(products),
             }
         except Exception as e:
             logger.error(f"Error in product search: {str(e)}")
@@ -387,16 +393,16 @@ class AIAssistantController:
                 
                 Message: {message}
                 Keywords:"""
-                
+
                 response = self.gemini_model.generate_content(prompt)
-                
+
                 extracted_terms = response.text.strip()
                 if extracted_terms and len(extracted_terms) > 0:
                     return extracted_terms
-            
+
             # Fallback to simple extraction
             return self._extract_search_terms(message)
-            
+
         except Exception as e:
             logger.error(f"Error extracting search terms with AI: {str(e)}")
             return self._extract_search_terms(message)
@@ -406,12 +412,12 @@ class AIAssistantController:
         try:
             if not self.gemini_model or not products:
                 return None
-                
+
             product_descriptions = []
             for product in products:
                 desc = f"{product.get('name', 'Unknown')} (${product.get('price', 0)}) - {product.get('category', 'General')}"
                 product_descriptions.append(desc)
-            
+
             prompt = f"""The user asked: "{original_message}"
             I found these products: {'; '.join(product_descriptions)}
             
@@ -423,11 +429,11 @@ class AIAssistantController:
             Keep it natural and friendly.
             
             Response:"""
-            
+
             response = self.gemini_model.generate_content(prompt)
-            
+
             return response.text.strip()
-            
+
         except Exception as e:
             logger.error(f"Error generating AI search response: {str(e)}")
             return None
@@ -492,19 +498,21 @@ class AIAssistantController:
             an e-commerce platform. You help customers find products, answer questions about 
             pricing, suggest alternatives, and provide shopping advice. Keep responses 
             conversational, helpful, and focused on retail/shopping topics. Limit responses to 150 words."""
-            
+
             # Combine system prompt with user message
             full_prompt = f"{system_prompt}\n\nUser: {message}\n\nAssistant:"
-            
+
             # Add context if provided
             if context and context.get("recent_searches"):
                 context_info = f"User has recently searched for: {', '.join(context['recent_searches'])}\n"
-                full_prompt = f"{system_prompt}\n\n{context_info}User: {message}\n\nAssistant:"
-            
+                full_prompt = (
+                    f"{system_prompt}\n\n{context_info}User: {message}\n\nAssistant:"
+                )
+
             response = self.gemini_model.generate_content(full_prompt)
-            
+
             return response.text.strip()
-            
+
         except Exception as e:
             logger.error(f"Gemini API error: {str(e)}")
             # Fallback to rule-based response

@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const ThemeContext = createContext();
 
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
 }
@@ -15,11 +15,13 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     // Check for saved theme preference or default to system theme
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+
     if (savedTheme) {
-      setIsDark(savedTheme === 'dark');
+      setIsDark(savedTheme === "dark");
     } else {
       setIsDark(systemPrefersDark);
     }
@@ -28,17 +30,17 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     // Apply theme to document
     if (isDark) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.style.setProperty('--toast-bg', '#374151');
-      document.documentElement.style.setProperty('--toast-color', '#f9fafb');
+      document.documentElement.classList.add("dark");
+      document.documentElement.style.setProperty("--toast-bg", "#374151");
+      document.documentElement.style.setProperty("--toast-color", "#f9fafb");
     } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.style.setProperty('--toast-bg', '#ffffff');
-      document.documentElement.style.setProperty('--toast-color', '#111827');
+      document.documentElement.classList.remove("dark");
+      document.documentElement.style.setProperty("--toast-bg", "#ffffff");
+      document.documentElement.style.setProperty("--toast-color", "#111827");
     }
-    
+
     // Save theme preference
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark]);
 
   const toggleTheme = () => {
@@ -51,8 +53,6 @@ export function ThemeProvider({ children }) {
   };
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }

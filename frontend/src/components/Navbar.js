@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../utils/AuthContext';
-import { 
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../utils/AuthContext";
+import {
   Store,
-  LayoutDashboard, 
-  ShoppingCart, 
-  Package, 
-  BarChart3, 
-  MessageSquare, 
+  LayoutDashboard,
+  ShoppingCart,
+  Package,
+  BarChart3,
+  MessageSquare,
   User,
   Bot,
   Plus,
@@ -16,8 +16,8 @@ import {
   X,
   ChevronDown,
   LogOut,
-  Settings
-} from 'lucide-react';
+  Settings,
+} from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -29,52 +29,53 @@ const Navbar = () => {
 
   const menuItems = [
     {
-      name: 'Dashboard',
-      href: '/dashboard',
+      name: "Dashboard",
+      href: "/dashboard",
       icon: LayoutDashboard,
-      showFor: ['customer', 'retailer']
+      showFor: ["customer", "retailer"],
     },
     {
-      name: 'AI Assistant',
-      href: '/ai-assistant',
+      name: "AI Assistant",
+      href: "/ai-assistant",
       icon: Bot,
-      showFor: ['customer', 'retailer']
+      showFor: ["customer", "retailer"],
     },
     {
-      name: 'Shopping',
-      href: '/shopping',
+      name: "Shopping",
+      href: "/shopping",
       icon: ShoppingCart,
-      showFor: ['customer']
+      showFor: ["customer"],
     },
     {
-      name: 'Inventory',
-      href: '/inventory',
+      name: "Inventory",
+      href: "/inventory",
       icon: Package,
-      showFor: ['retailer']
+      showFor: ["retailer"],
     },
     {
-      name: 'Analytics',
-      href: '/analytics',
+      name: "Analytics",
+      href: "/analytics",
       icon: BarChart3,
-      showFor: ['retailer']
+      showFor: ["retailer"],
     },
     {
-      name: 'Customers',
-      href: '/customers',
+      name: "Customers",
+      href: "/customers",
       icon: Users,
-      showFor: ['retailer']
+      showFor: ["retailer"],
     },
     {
-      name: 'Feedback',
-      href: '/feedback',
+      name: "Feedback",
+      href: "/feedback",
       icon: MessageSquare,
-      showFor: ['customer', 'retailer']
-    }
+      showFor: ["customer", "retailer"],
+    },
   ];
 
   // Filter menu items based on user type
-  const filteredMenuItems = menuItems.filter(item => 
-    !item.showFor || item.showFor.includes(user?.userType || 'customer')
+  const filteredMenuItems = menuItems.filter(
+    (item) =>
+      !item.showFor || item.showFor.includes(user?.userType || "customer"),
   );
 
   const isActive = (path) => location.pathname === path;
@@ -82,24 +83,27 @@ const Navbar = () => {
   // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
         setProfileDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const handleAddProduct = () => {
-    navigate('/inventory/add');
+    navigate("/inventory/add");
   };
 
   return (
@@ -121,15 +125,15 @@ const Navbar = () => {
             {filteredMenuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
-              
+
               return (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                      ? "bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
@@ -142,7 +146,7 @@ const Navbar = () => {
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
             {/* Add Product Button - Only for retailers */}
-            {user?.userType === 'retailer' && (
+            {user?.userType === "retailer" && (
               <button
                 onClick={handleAddProduct}
                 className="hidden sm:flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md text-sm font-medium transition-colors duration-200"
@@ -162,7 +166,7 @@ const Navbar = () => {
                   <User className="h-4 w-4 text-white" />
                 </div>
                 <span className="hidden sm:block text-sm font-medium">
-                  {user?.name || user?.email || 'User'}
+                  {user?.name || user?.email || "User"}
                 </span>
                 <ChevronDown className="h-4 w-4" />
               </button>
@@ -222,7 +226,7 @@ const Navbar = () => {
               {filteredMenuItems.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href);
-                
+
                 return (
                   <Link
                     key={item.name}
@@ -230,8 +234,8 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-all duration-200 ${
                       active
-                        ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300'
-                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                        ? "bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300"
+                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
                     <Icon className="h-5 w-5 mr-3" />
@@ -239,9 +243,9 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-              
+
               {/* Mobile Add Product Button - Only for retailers */}
-              {user?.userType === 'retailer' && (
+              {user?.userType === "retailer" && (
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);

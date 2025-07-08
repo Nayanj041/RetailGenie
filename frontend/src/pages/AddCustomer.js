@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { ArrowLeft, User, Mail, Phone, MapPin, CreditCard } from 'lucide-react';
-import { api } from '../utils/api';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { ArrowLeft, User, Mail, Phone, MapPin, CreditCard } from "lucide-react";
+import { api } from "../utils/api";
 
 const AddCustomer = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: '',
-    dateOfBirth: '',
-    gender: '',
-    notes: '',
-    status: 'active'
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    dateOfBirth: "",
+    gender: "",
+    notes: "",
+    status: "active",
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -35,12 +35,12 @@ const AddCustomer = () => {
     setLoading(true);
 
     try {
-      const response = await api.post('/customers', formData);
-      toast.success('Customer added successfully!');
-      navigate('/customers');
+      const response = await api.post("/customers", formData);
+      toast.success("Customer added successfully!");
+      navigate("/customers");
     } catch (error) {
-      console.error('Error adding customer:', error);
-      toast.error(error.response?.data?.message || 'Failed to add customer');
+      console.error("Error adding customer:", error);
+      toast.error(error.response?.data?.message || "Failed to add customer");
     } finally {
       setLoading(false);
     }
@@ -51,13 +51,15 @@ const AddCustomer = () => {
       {/* Header */}
       <div className="mb-8">
         <button
-          onClick={() => navigate('/customers')}
+          onClick={() => navigate("/customers")}
           className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Customers
         </button>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Add New Customer</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Add New Customer
+        </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
           Fill in the customer details below to add them to your database.
         </p>
@@ -70,7 +72,7 @@ const AddCustomer = () => {
             <User className="h-5 w-5 mr-2" />
             Personal Information
           </h2>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -171,7 +173,7 @@ const AddCustomer = () => {
             <MapPin className="h-5 w-5 mr-2" />
             Address Information
           </h2>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -251,7 +253,7 @@ const AddCustomer = () => {
             <CreditCard className="h-5 w-5 mr-2" />
             Additional Information
           </h2>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Notes
@@ -271,7 +273,7 @@ const AddCustomer = () => {
         <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
-            onClick={() => navigate('/customers')}
+            onClick={() => navigate("/customers")}
             className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             Cancel
@@ -281,7 +283,7 @@ const AddCustomer = () => {
             disabled={loading}
             className="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? 'Adding Customer...' : 'Add Customer'}
+            {loading ? "Adding Customer..." : "Add Customer"}
           </button>
         </div>
       </form>

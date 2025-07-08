@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { 
-  Users, 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit, 
-  Trash2, 
-  Mail, 
-  Phone, 
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import {
+  Users,
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  Mail,
+  Phone,
   MapPin,
   TrendingUp,
   TrendingDown,
   Calendar,
-  ShoppingBag
-} from 'lucide-react';
-import { api } from '../utils/api';
-import LoadingSpinner from '../components/LoadingSpinner';
+  ShoppingBag,
+} from "lucide-react";
+import { api } from "../utils/api";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Customers = () => {
   const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   useEffect(() => {
     fetchCustomers();
@@ -32,11 +32,11 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await api.get('/customers');
+      const response = await api.get("/customers");
       setCustomers(response.data);
     } catch (error) {
-      console.error('Error fetching customers:', error);
-      toast.error('Failed to load customers');
+      console.error("Error fetching customers:", error);
+      toast.error("Failed to load customers");
       setCustomers([]);
     } finally {
       setLoading(false);
@@ -44,36 +44,52 @@ const Customers = () => {
   };
 
   const handleDeleteCustomer = async (customerId) => {
-    if (!window.confirm('Are you sure you want to delete this customer?')) {
+    if (!window.confirm("Are you sure you want to delete this customer?")) {
       return;
     }
 
     try {
       await api.delete(`/customers/${customerId}`);
-      setCustomers(customers.filter(customer => customer.id !== customerId));
-      toast.success('Customer deleted successfully');
+      setCustomers(customers.filter((customer) => customer.id !== customerId));
+      toast.success("Customer deleted successfully");
     } catch (error) {
-      console.error('Error deleting customer:', error);
-      toast.error('Failed to delete customer');
+      console.error("Error deleting customer:", error);
+      toast.error("Failed to delete customer");
     }
   };
 
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || customer.status === filterStatus;
+  const filteredCustomers = customers.filter((customer) => {
+    const matchesSearch =
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      filterStatus === "all" || customer.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      active: { color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400', label: 'Active' },
-      inactive: { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400', label: 'Inactive' },
-      vip: { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400', label: 'VIP' }
+      active: {
+        color:
+          "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+        label: "Active",
+      },
+      inactive: {
+        color:
+          "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
+        label: "Inactive",
+      },
+      vip: {
+        color:
+          "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400",
+        label: "VIP",
+      },
     };
     const config = statusConfig[status] || statusConfig.active;
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.color}`}>
+      <span
+        className={`px-2 py-1 text-xs font-medium rounded-full ${config.color}`}
+      >
         {config.label}
       </span>
     );
@@ -81,9 +97,15 @@ const Customers = () => {
 
   const calculateStats = () => {
     const totalCustomers = customers.length;
-    const activeCustomers = customers.filter(c => c.status === 'active' || c.status === 'vip').length;
-    const totalRevenue = customers.reduce((sum, c) => sum + c.totalPurchases, 0);
-    const averageOrderValue = totalRevenue / customers.reduce((sum, c) => sum + c.totalOrders, 0) || 0;
+    const activeCustomers = customers.filter(
+      (c) => c.status === "active" || c.status === "vip",
+    ).length;
+    const totalRevenue = customers.reduce(
+      (sum, c) => sum + c.totalPurchases,
+      0,
+    );
+    const averageOrderValue =
+      totalRevenue / customers.reduce((sum, c) => sum + c.totalOrders, 0) || 0;
 
     return { totalCustomers, activeCustomers, totalRevenue, averageOrderValue };
   };
@@ -99,7 +121,9 @@ const Customers = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Customer Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Customer Management
+          </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Manage your customers and view their purchase history
           </p>
@@ -118,8 +142,12 @@ const Customers = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Customers</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalCustomers}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Customers
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {stats.totalCustomers}
+              </p>
             </div>
             <Users className="h-8 w-8 text-blue-600" />
           </div>
@@ -128,8 +156,12 @@ const Customers = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Customers</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.activeCustomers}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Active Customers
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {stats.activeCustomers}
+              </p>
             </div>
             <TrendingUp className="h-8 w-8 text-green-600" />
           </div>
@@ -138,8 +170,12 @@ const Customers = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">${stats.totalRevenue.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Revenue
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                ${stats.totalRevenue.toFixed(2)}
+              </p>
             </div>
             <TrendingUp className="h-8 w-8 text-purple-600" />
           </div>
@@ -148,8 +184,12 @@ const Customers = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg. Order Value</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">${stats.averageOrderValue.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Avg. Order Value
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                ${stats.averageOrderValue.toFixed(2)}
+              </p>
             </div>
             <ShoppingBag className="h-8 w-8 text-orange-600" />
           </div>
@@ -218,7 +258,10 @@ const Customers = () => {
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredCustomers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr
+                  key={customer.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
@@ -256,7 +299,9 @@ const Customers = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
                       <button
-                        onClick={() => navigate(`/customers/edit/${customer.id}`)}
+                        onClick={() =>
+                          navigate(`/customers/edit/${customer.id}`)
+                        }
                         className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                       >
                         <Edit className="h-4 w-4" />
@@ -278,12 +323,13 @@ const Customers = () => {
         {filteredCustomers.length === 0 && (
           <div className="text-center py-12">
             <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No customers found</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              No customers found
+            </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {searchTerm || filterStatus !== 'all' 
-                ? 'Try adjusting your search or filters' 
-                : 'Get started by adding your first customer'
-              }
+              {searchTerm || filterStatus !== "all"
+                ? "Try adjusting your search or filters"
+                : "Get started by adding your first customer"}
             </p>
           </div>
         )}

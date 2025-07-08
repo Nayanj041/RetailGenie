@@ -1,21 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
-import { MessageCircle, Send, ThumbsUp, ThumbsDown, Star, Filter, Search } from 'lucide-react';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { useAuth } from '../utils/AuthContext';
-import { api } from '../utils/api';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import {
+  MessageCircle,
+  Send,
+  ThumbsUp,
+  ThumbsDown,
+  Star,
+  Filter,
+  Search,
+} from "lucide-react";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../utils/AuthContext";
+import { api } from "../utils/api";
 
 const Feedback = () => {
   const { token } = useAuth();
   const [feedback, setFeedback] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRating, setFilterRating] = useState('all');
-  const [filterSentiment, setFilterSentiment] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterRating, setFilterRating] = useState("all");
+  const [filterSentiment, setFilterSentiment] = useState("all");
   const [sentimentAnalysis, setSentimentAnalysis] = useState({});
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
-  const [replyText, setReplyText] = useState('');
+  const [replyText, setReplyText] = useState("");
 
   useEffect(() => {
     fetchFeedback();
@@ -25,15 +33,15 @@ const Feedback = () => {
   const fetchFeedback = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/feedback', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await api.get("/feedback", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setFeedback(response.data.feedback || []);
     } catch (error) {
-      console.error('Error fetching feedback:', error);
+      console.error("Error fetching feedback:", error);
       // Fallback to empty data
       setFeedback([]);
-      toast.error('Failed to load feedback');
+      toast.error("Failed to load feedback");
     } finally {
       setLoading(false);
     }
@@ -41,51 +49,62 @@ const Feedback = () => {
 
   const fetchSentimentAnalysis = async () => {
     try {
-      const response = await api.get('/ml/sentiment/analysis', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await api.get("/ml/sentiment/analysis", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setSentimentAnalysis(response.data.analysis || {});
     } catch (error) {
-      console.error('Error fetching sentiment analysis:', error);
+      console.error("Error fetching sentiment analysis:", error);
       setSentimentAnalysis({
-        overall_sentiment: 'neutral',
+        overall_sentiment: "neutral",
         sentiment_distribution: { positive: 0, neutral: 0, negative: 0 },
-        trending_topics: []
+        trending_topics: [],
       });
-      toast.error('Failed to load sentiment analysis');
+      toast.error("Failed to load sentiment analysis");
     }
   };
 
   const replyToFeedback = async () => {
     try {
-      await api.post(`/feedback/${replyingTo.id}/reply`, {
-        response: replyText
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(
+        `/feedback/${replyingTo.id}/reply`,
+        {
+          response: replyText,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       fetchFeedback();
       setShowReplyModal(false);
       setReplyingTo(null);
-      setReplyText('');
+      setReplyText("");
     } catch (error) {
-      console.error('Error replying to feedback:', error);
+      console.error("Error replying to feedback:", error);
     }
   };
 
   const getSentimentColor = (sentiment) => {
     switch (sentiment) {
-      case 'positive': return 'text-green-600 bg-green-100';
-      case 'negative': return 'text-red-600 bg-red-100';
-      case 'neutral': return 'text-yellow-600 bg-yellow-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "positive":
+        return "text-green-600 bg-green-100";
+      case "negative":
+        return "text-red-600 bg-red-100";
+      case "neutral":
+        return "text-yellow-600 bg-yellow-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'responded': return 'text-blue-600 bg-blue-100';
-      case 'pending': return 'text-orange-600 bg-orange-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "responded":
+        return "text-blue-600 bg-blue-100";
+      case "pending":
+        return "text-orange-600 bg-orange-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
@@ -94,21 +113,23 @@ const Feedback = () => {
       <Star
         key={i}
         className={`h-4 w-4 ${
-          i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
         }`}
       />
     ));
   };
 
-  const filteredFeedback = feedback.filter(item => {
-    const matchesSearch = 
+  const filteredFeedback = feedback.filter((item) => {
+    const matchesSearch =
       item.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.comment.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesRating = filterRating === 'all' || item.rating === parseInt(filterRating);
-    const matchesSentiment = filterSentiment === 'all' || item.sentiment === filterSentiment;
-    
+
+    const matchesRating =
+      filterRating === "all" || item.rating === parseInt(filterRating);
+    const matchesSentiment =
+      filterSentiment === "all" || item.sentiment === filterSentiment;
+
     return matchesSearch && matchesRating && matchesSentiment;
   });
 
@@ -121,8 +142,13 @@ const Feedback = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Customer Feedback</h1>
-          <p className="text-gray-600">Monitor and respond to customer feedback with AI-powered sentiment analysis</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Customer Feedback
+          </h1>
+          <p className="text-gray-600">
+            Monitor and respond to customer feedback with AI-powered sentiment
+            analysis
+          </p>
         </div>
 
         {/* Sentiment Overview */}
@@ -130,7 +156,9 @@ const Feedback = () => {
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Overall Sentiment</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Overall Sentiment
+                </p>
                 <p className="text-2xl font-bold capitalize text-gray-900">
                   {sentimentAnalysis.overall_sentiment}
                 </p>
@@ -178,17 +206,28 @@ const Feedback = () => {
 
         {/* Trending Topics */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Trending Topics</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Trending Topics
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {sentimentAnalysis.trending_topics?.map((topic, index) => (
-              <div key={index} className="p-4 border border-gray-200 rounded-lg">
+              <div
+                key={index}
+                className="p-4 border border-gray-200 rounded-lg"
+              >
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-gray-900 capitalize">{topic.topic}</h4>
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getSentimentColor(topic.sentiment)}`}>
+                  <h4 className="font-medium text-gray-900 capitalize">
+                    {topic.topic}
+                  </h4>
+                  <span
+                    className={`px-2 py-1 text-xs font-semibold rounded-full ${getSentimentColor(topic.sentiment)}`}
+                  >
                     {topic.sentiment}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">{topic.mentions} mentions</p>
+                <p className="text-sm text-gray-600">
+                  {topic.mentions} mentions
+                </p>
               </div>
             )) || []}
           </div>
@@ -240,20 +279,28 @@ const Feedback = () => {
             <div key={item.id} className="bg-white rounded-lg shadow-md p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-900">{item.customer_name}</h3>
+                  <h3 className="font-semibold text-lg text-gray-900">
+                    {item.customer_name}
+                  </h3>
                   <p className="text-sm text-gray-600">{item.customer_email}</p>
                   <p className="text-sm text-gray-600">{item.product_name}</p>
                 </div>
                 <div className="text-right">
                   <div className="flex items-center mb-2">
                     {renderStars(item.rating)}
-                    <span className="ml-2 text-sm text-gray-600">({item.rating}/5)</span>
+                    <span className="ml-2 text-sm text-gray-600">
+                      ({item.rating}/5)
+                    </span>
                   </div>
                   <div className="flex space-x-2">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getSentimentColor(item.sentiment)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${getSentimentColor(item.sentiment)}`}
+                    >
                       {item.sentiment}
                     </span>
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(item.status)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(item.status)}`}
+                    >
                       {item.status}
                     </span>
                   </div>
@@ -267,7 +314,9 @@ const Feedback = () => {
 
               {item.response && (
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                  <p className="text-sm font-medium text-blue-800">Your Response:</p>
+                  <p className="text-sm font-medium text-blue-800">
+                    Your Response:
+                  </p>
                   <p className="text-blue-700">{item.response}</p>
                 </div>
               )}
@@ -291,8 +340,12 @@ const Feedback = () => {
         {filteredFeedback.length === 0 && (
           <div className="text-center py-12">
             <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No feedback found</h3>
-            <p className="text-gray-600">Try adjusting your filters or search terms</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No feedback found
+            </h3>
+            <p className="text-gray-600">
+              Try adjusting your filters or search terms
+            </p>
           </div>
         )}
 
@@ -303,9 +356,11 @@ const Feedback = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 Reply to {replyingTo.customer_name}
               </h3>
-              
+
               <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600 font-medium">Original Feedback:</p>
+                <p className="text-sm text-gray-600 font-medium">
+                  Original Feedback:
+                </p>
                 <p className="text-sm text-gray-700">{replyingTo.comment}</p>
               </div>
 
@@ -322,7 +377,7 @@ const Feedback = () => {
                   onClick={() => {
                     setShowReplyModal(false);
                     setReplyingTo(null);
-                    setReplyText('');
+                    setReplyText("");
                   }}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
                 >

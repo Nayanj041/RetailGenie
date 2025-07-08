@@ -23,21 +23,23 @@ class AIEngine:
         # Initialize Google Gemini with error handling
         self.gemini_model = None
         self._initialize_gemini()
-        
+
     def _initialize_gemini(self):
         """Initialize Gemini with proper error handling"""
         try:
             gemini_api_key = os.getenv("GEMINI_API_KEY")
             if gemini_api_key:
                 genai.configure(api_key=gemini_api_key)
-                self.gemini_model = genai.GenerativeModel(os.getenv("GEMINI_MODEL", "gemini-pro"))
+                self.gemini_model = genai.GenerativeModel(
+                    os.getenv("GEMINI_MODEL", "gemini-pro")
+                )
                 logger.info("AI Engine: Gemini initialized successfully")
             else:
                 logger.warning("AI Engine: Gemini API key not found")
         except Exception as e:
             logger.warning(f"AI Engine: Failed to initialize Gemini: {str(e)}")
             self.gemini_model = None
-            
+
         self.tfidf_vectorizer = TfidfVectorizer(max_features=1000, stop_words="english")
 
     def forecast_demand(

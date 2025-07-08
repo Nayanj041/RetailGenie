@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-const LoadingSpinner = ({ size = 'md', text = 'Loading...' }) => {
+const LoadingSpinner = ({ size = "md", text = "Loading..." }) => {
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16',
+    sm: "w-4 h-4",
+    md: "w-8 h-8",
+    lg: "w-12 h-12",
+    xl: "w-16 h-16",
   };
 
   return (
@@ -38,7 +38,7 @@ const LoadingSpinner = ({ size = 'md', text = 'Loading...' }) => {
           </span>
         )}
       </div>
-      
+
       <div className="mt-4 text-center">
         <h2 className="text-2xl font-bold text-gradient">RetailGenie</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">

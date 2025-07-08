@@ -11,10 +11,11 @@ import subprocess
 import time
 import signal
 
+
 def test_registration():
     """Test registration endpoint directly"""
     print("🧪 Testing Registration Endpoint...")
-    
+
     # Start a simple Flask app for testing
     test_app_code = """
 import os
@@ -74,47 +75,49 @@ def health():
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)
 """
-    
+
     # Write test app to file
-    with open('/tmp/test_app.py', 'w') as f:
+    with open("/tmp/test_app.py", "w") as f:
         f.write(test_app_code)
-    
+
     # Start test app
     print("Starting test server on port 5001...")
-    proc = subprocess.Popen([sys.executable, '/tmp/test_app.py'], 
-                           stdout=subprocess.PIPE, 
-                           stderr=subprocess.PIPE)
-    
+    proc = subprocess.Popen(
+        [sys.executable, "/tmp/test_app.py"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
     time.sleep(3)  # Wait for server to start
-    
+
     try:
         # Test health endpoint
-        health_response = requests.get('http://localhost:5001/api/v1/health', timeout=5)
+        health_response = requests.get("http://localhost:5001/api/v1/health", timeout=5)
         print(f"Health check: {health_response.status_code}")
-        
+
         # Test registration
         registration_data = {
             "name": "Test Retailer",
             "email": "test@example.com",
             "password": "test123",
-            "business_name": "Test Store"
+            "business_name": "Test Store",
         }
-        
+
         response = requests.post(
-            'http://localhost:5001/api/v1/auth/register',
+            "http://localhost:5001/api/v1/auth/register",
             json=registration_data,
-            headers={'Content-Type': 'application/json'},
-            timeout=10
+            headers={"Content-Type": "application/json"},
+            timeout=10,
         )
-        
+
         print(f"Registration Status Code: {response.status_code}")
         print(f"Registration Response: {response.json()}")
-        
+
         if response.status_code == 201:
             print("✅ Registration endpoint works!")
         else:
             print("❌ Registration failed")
-            
+
     except requests.exceptions.RequestException as e:
         print(f"❌ Connection error: {e}")
     except Exception as e:
@@ -123,6 +126,7 @@ if __name__ == '__main__':
         # Clean up
         proc.terminate()
         proc.wait()
+
 
 if __name__ == "__main__":
     test_registration()

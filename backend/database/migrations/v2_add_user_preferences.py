@@ -25,32 +25,28 @@ def migrate():
     try:
         # Create user_preferences collection schema
         preferences_schema = {
-            'initialized': True,
-            'version': '2.0',
-            'schema_version': 2,
-            'description': 'User preferences and personalization settings',
-            'fields': {
-                'user_id': 'string (required, unique)',
-                'theme': 'string (light/dark/auto)',
-                'language': 'string (en/es/fr/de)',
-                'currency': 'string (USD/EUR/GBP)',
-                'notification_preferences': 'object',
-                'privacy_settings': 'object',
-                'ai_recommendations_enabled': 'boolean',
-                'marketing_emails': 'boolean',
-                'created_at': 'timestamp',
-                'updated_at': 'timestamp'
+            "initialized": True,
+            "version": "2.0",
+            "schema_version": 2,
+            "description": "User preferences and personalization settings",
+            "fields": {
+                "user_id": "string (required, unique)",
+                "theme": "string (light/dark/auto)",
+                "language": "string (en/es/fr/de)",
+                "currency": "string (USD/EUR/GBP)",
+                "notification_preferences": "object",
+                "privacy_settings": "object",
+                "ai_recommendations_enabled": "boolean",
+                "marketing_emails": "boolean",
+                "created_at": "timestamp",
+                "updated_at": "timestamp",
             },
-            'indexes': [
-                'user_id',
-                'theme',
-                'language'
-            ],
-            'created_at': datetime.now(timezone.utc).isoformat()
+            "indexes": ["user_id", "theme", "language"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
         # Create the preferences collection
-        doc_id = firebase.create_document('user_preferences', preferences_schema)
+        doc_id = firebase.create_document("user_preferences", preferences_schema)
 
         if doc_id:
             logger.info("✅ Created user_preferences collection schema")
@@ -58,19 +54,19 @@ def migrate():
             raise Exception("Failed to create user_preferences collection")
 
         # Update users collection to include preferences reference
-        users_docs = firebase.get_documents('users')
+        users_docs = firebase.get_documents("users")
         updated_count = 0
 
         for user_doc in users_docs:
-            if 'preferences_id' not in user_doc:
+            if "preferences_id" not in user_doc:
                 # Add preferences reference to existing users
                 update_data = {
-                    'preferences_id': None,  # Will be set when user creates preferences
-                    'preferences_created': False,
-                    'updated_at': datetime.now(timezone.utc).isoformat()
+                    "preferences_id": None,  # Will be set when user creates preferences
+                    "preferences_created": False,
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
                 }
 
-                success = firebase.update_document('users', user_doc['id'], update_data)
+                success = firebase.update_document("users", user_doc["id"], update_data)
                 if success:
                     updated_count += 1
 
@@ -78,44 +74,46 @@ def migrate():
 
         # Create default notification types collection
         notification_types_schema = {
-            'initialized': True,
-            'version': '2.0',
-            'schema_version': 2,
-            'description': 'Available notification types and settings',
-            'notification_types': [
+            "initialized": True,
+            "version": "2.0",
+            "schema_version": 2,
+            "description": "Available notification types and settings",
+            "notification_types": [
                 {
-                    'type': 'order_updates',
-                    'name': 'Order Updates',
-                    'description': 'Notifications about order status changes',
-                    'default_enabled': True,
-                    'channels': ['email', 'push']
+                    "type": "order_updates",
+                    "name": "Order Updates",
+                    "description": "Notifications about order status changes",
+                    "default_enabled": True,
+                    "channels": ["email", "push"],
                 },
                 {
-                    'type': 'product_recommendations',
-                    'name': 'Product Recommendations',
-                    'description': 'AI-powered product suggestions',
-                    'default_enabled': True,
-                    'channels': ['email', 'in_app']
+                    "type": "product_recommendations",
+                    "name": "Product Recommendations",
+                    "description": "AI-powered product suggestions",
+                    "default_enabled": True,
+                    "channels": ["email", "in_app"],
                 },
                 {
-                    'type': 'price_alerts',
-                    'name': 'Price Alerts',
-                    'description': 'Notifications when watched products go on sale',
-                    'default_enabled': False,
-                    'channels': ['email', 'push']
+                    "type": "price_alerts",
+                    "name": "Price Alerts",
+                    "description": "Notifications when watched products go on sale",
+                    "default_enabled": False,
+                    "channels": ["email", "push"],
                 },
                 {
-                    'type': 'newsletter',
-                    'name': 'Newsletter',
-                    'description': 'Weekly newsletter with trends and offers',
-                    'default_enabled': False,
-                    'channels': ['email']
-                }
+                    "type": "newsletter",
+                    "name": "Newsletter",
+                    "description": "Weekly newsletter with trends and offers",
+                    "default_enabled": False,
+                    "channels": ["email"],
+                },
             ],
-            'created_at': datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
-        doc_id = firebase.create_document('notification_types', notification_types_schema)
+        doc_id = firebase.create_document(
+            "notification_types", notification_types_schema
+        )
 
         if doc_id:
             logger.info("✅ Created notification_types collection")
@@ -142,16 +140,18 @@ def rollback():
 
     try:
         # Remove preferences-related fields from users
-        users_docs = firebase.get_documents('users')
+        users_docs = firebase.get_documents("users")
         rollback_count = 0
 
         for user_doc in users_docs:
-            if 'preferences_id' in user_doc or 'preferences_created' in user_doc:
+            if "preferences_id" in user_doc or "preferences_created" in user_doc:
                 # Remove the added fields
                 # Note: Firestore doesn't support field deletion via update
                 # This is a simplified rollback - in production, you might need
                 # to recreate documents without the unwanted fields
-                logger.info(f"Would rollback user document: {user_doc.get('id', 'unknown')}")
+                logger.info(
+                    f"Would rollback user document: {user_doc.get('id', 'unknown')}"
+                )
                 rollback_count += 1
 
         logger.info(f"✅ Would rollback {rollback_count} user documents")
@@ -162,7 +162,9 @@ def rollback():
         # 3. Remove added fields from users (requires document recreation)
 
         logger.warning("⚠️ Full rollback requires manual cleanup of collections")
-        logger.info("Collections to manually delete: user_preferences, notification_types")
+        logger.info(
+            "Collections to manually delete: user_preferences, notification_types"
+        )
 
         return True
 
@@ -171,11 +173,11 @@ def rollback():
         return False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Configure logging
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     success = migrate()

@@ -1,55 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API URL Test</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>API URL Detection Test</h1>
     <p id="hostname">Hostname: <span id="hostname-value"></span></p>
     <p id="api-url">API Base URL: <span id="api-url-value"></span></p>
     <p id="codespace">Codespace Name: <span id="codespace-value"></span></p>
-    
+
     <script>
-        // Simulate the same logic as AuthContext
-        const getApiBaseUrl = () => {
-            // Check environment variable (simulated)
-            const reactAppApiUrl = null; // process.env.REACT_APP_API_URL would be null in browser
-            if (reactAppApiUrl) {
-                return reactAppApiUrl;
-            }
-            
-            // Check if we're in a GitHub Codespace
-            const hostname = window.location.hostname;
-            const isCodespace = hostname.includes('app.github.dev');
-            
-            if (isCodespace) {
-                const codespaceBase = hostname.replace('-3001', '-5000').replace('-3000', '-5000');
-                return `https://${codespaceBase}`;
-            }
-            
-            return 'http://127.0.0.1:5000';
-        };
-        
-        document.getElementById('hostname-value').textContent = window.location.hostname;
-        document.getElementById('api-url-value').textContent = getApiBaseUrl();
-        document.getElementById('codespace-value').textContent = window.location.hostname.includes('app.github.dev') ? 'Yes' : 'No';
-        
-        // Test the API
-        const testApi = async () => {
-            const apiUrl = getApiBaseUrl();
-            try {
-                const response = await fetch(`${apiUrl}/api/v1/health`);
-                console.log('API Test Result:', response.status, response.ok);
-                const data = await response.json();
-                console.log('API Data:', data);
-            } catch (error) {
-                console.error('API Test Error:', error);
-            }
-        };
-        
-        testApi();
+      // Simulate the same logic as AuthContext
+      const getApiBaseUrl = () => {
+        // Check environment variable (simulated)
+        const reactAppApiUrl = null; // process.env.REACT_APP_API_URL would be null in browser
+        if (reactAppApiUrl) {
+          return reactAppApiUrl;
+        }
+
+        // Check if we're in a GitHub Codespace
+        const hostname = window.location.hostname;
+        const isCodespace = hostname.includes("app.github.dev");
+
+        if (isCodespace) {
+          const codespaceBase = hostname
+            .replace("-3001", "-5000")
+            .replace("-3000", "-5000");
+          return `https://${codespaceBase}`;
+        }
+
+        return "http://127.0.0.1:5000";
+      };
+
+      document.getElementById("hostname-value").textContent =
+        window.location.hostname;
+      document.getElementById("api-url-value").textContent = getApiBaseUrl();
+      document.getElementById("codespace-value").textContent =
+        window.location.hostname.includes("app.github.dev") ? "Yes" : "No";
+
+      // Test the API
+      const testApi = async () => {
+        const apiUrl = getApiBaseUrl();
+        try {
+          const response = await fetch(`${apiUrl}/api/v1/health`);
+          console.log("API Test Result:", response.status, response.ok);
+          const data = await response.json();
+          console.log("API Data:", data);
+        } catch (error) {
+          console.error("API Test Error:", error);
+        }
+      };
+
+      testApi();
     </script>
-</body>
+  </body>
 </html>

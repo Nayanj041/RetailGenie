@@ -1,56 +1,64 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { ArrowLeft, Upload, X, DollarSign, Package, Tag, FileText } from 'lucide-react';
-import { api } from '../utils/api';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import {
+  ArrowLeft,
+  Upload,
+  X,
+  DollarSign,
+  Package,
+  Tag,
+  FileText,
+} from "lucide-react";
+import { api } from "../utils/api";
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    price: '',
-    cost: '',
-    sku: '',
-    stock_quantity: '',
-    minimum_stock: '',
-    brand: '',
-    tags: '',
-    image: null
+    name: "",
+    description: "",
+    category: "",
+    price: "",
+    cost: "",
+    sku: "",
+    stock_quantity: "",
+    minimum_stock: "",
+    brand: "",
+    tags: "",
+    image: null,
   });
 
   const categories = [
-    'Electronics',
-    'Clothing',
-    'Home & Garden',
-    'Sports & Outdoors',
-    'Health & Beauty',
-    'Books',
-    'Toys & Games',
-    'Automotive',
-    'Food & Beverages',
-    'Office Supplies'
+    "Electronics",
+    "Clothing",
+    "Home & Garden",
+    "Sports & Outdoors",
+    "Health & Beauty",
+    "Books",
+    "Toys & Games",
+    "Automotive",
+    "Food & Beverages",
+    "Office Supplies",
   ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        image: file
+        image: file,
       }));
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -61,9 +69,9 @@ const AddProduct = () => {
   };
 
   const removeImage = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      image: null
+      image: null,
     }));
     setImagePreview(null);
   };
@@ -75,25 +83,25 @@ const AddProduct = () => {
     try {
       // Create FormData for file upload
       const submitData = new FormData();
-      
+
       // Add all form fields
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== '') {
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] !== null && formData[key] !== "") {
           submitData.append(key, formData[key]);
         }
       });
 
-      const response = await api.post('/products', submitData, {
+      const response = await api.post("/products", submitData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      toast.success('Product added successfully!');
-      navigate('/inventory');
+      toast.success("Product added successfully!");
+      navigate("/inventory");
     } catch (error) {
-      console.error('Error adding product:', error);
-      toast.error(error.response?.data?.message || 'Failed to add product');
+      console.error("Error adding product:", error);
+      toast.error(error.response?.data?.message || "Failed to add product");
     } finally {
       setLoading(false);
     }
@@ -104,13 +112,15 @@ const AddProduct = () => {
       {/* Header */}
       <div className="mb-8">
         <button
-          onClick={() => navigate('/inventory')}
+          onClick={() => navigate("/inventory")}
           className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Inventory
         </button>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Add New Product</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Add New Product
+        </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
           Fill in the details below to add a new product to your inventory.
         </p>
@@ -126,7 +136,7 @@ const AddProduct = () => {
                 <Package className="h-5 w-5 mr-2" />
                 Basic Information
               </h2>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -170,8 +180,10 @@ const AddProduct = () => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
                   >
                     <option value="">Select category</option>
-                    {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -226,7 +238,7 @@ const AddProduct = () => {
                 <DollarSign className="h-5 w-5 mr-2" />
                 Pricing & Inventory
               </h2>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -338,7 +350,7 @@ const AddProduct = () => {
         <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
-            onClick={() => navigate('/inventory')}
+            onClick={() => navigate("/inventory")}
             className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             Cancel
@@ -348,7 +360,7 @@ const AddProduct = () => {
             disabled={loading}
             className="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? 'Adding Product...' : 'Add Product'}
+            {loading ? "Adding Product..." : "Add Product"}
           </button>
         </div>
       </form>

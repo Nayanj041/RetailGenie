@@ -18,8 +18,4 @@ __version__ = "1.0.0"
 __author__ = "RetailGenie AI Team"
 
 # Export main classes and utility functions
-__all__ = [
-    'SentimentAnalyzer',
-    'InventoryForecastingModel', 
-    'DynamicPricingEngine'
-]
+__all__ = ["SentimentAnalyzer", "InventoryForecastingModel", "DynamicPricingEngine"]

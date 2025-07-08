@@ -1,65 +1,65 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Package, 
-  BarChart3, 
-  MessageSquare, 
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Package,
+  BarChart3,
+  MessageSquare,
   User,
   X,
   Bot,
   Store,
   TrendingUp,
-  Zap
-} from 'lucide-react';
+  Zap,
+} from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
 
   const menuItems = [
     {
-      name: 'Dashboard',
-      href: '/dashboard',
+      name: "Dashboard",
+      href: "/dashboard",
       icon: LayoutDashboard,
-      description: 'Overview & Analytics'
+      description: "Overview & Analytics",
     },
     {
-      name: 'AI Assistant',
-      href: '/ai-assistant',
+      name: "AI Assistant",
+      href: "/ai-assistant",
       icon: Bot,
-      description: 'Chat with AI'
+      description: "Chat with AI",
     },
     {
-      name: 'Smart Shopping',
-      href: '/shopping',
+      name: "Smart Shopping",
+      href: "/shopping",
       icon: ShoppingCart,
-      description: 'Browse Products'
+      description: "Browse Products",
     },
     {
-      name: 'Inventory',
-      href: '/inventory',
+      name: "Inventory",
+      href: "/inventory",
       icon: Package,
-      description: 'Stock Management'
+      description: "Stock Management",
     },
     {
-      name: 'Analytics',
-      href: '/analytics',
+      name: "Analytics",
+      href: "/analytics",
       icon: BarChart3,
-      description: 'Sales & Performance'
+      description: "Sales & Performance",
     },
     {
-      name: 'Feedback',
-      href: '/feedback',
+      name: "Feedback",
+      href: "/feedback",
       icon: MessageSquare,
-      description: 'Customer Reviews'
+      description: "Customer Reviews",
     },
     {
-      name: 'Profile',
-      href: '/profile',
+      name: "Profile",
+      href: "/profile",
       icon: User,
-      description: 'Account Settings'
-    }
+      description: "Account Settings",
+    },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -68,17 +68,18 @@ const Sidebar = ({ isOpen, onClose }) => {
     <>
       {/* Mobile backdrop */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0 lg:static lg:inset-0`}>
-        
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 lg:static lg:inset-0`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-2">
@@ -101,7 +102,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
-              
+
               return (
                 <Link
                   key={item.name}
@@ -109,13 +110,17 @@ const Sidebar = ({ isOpen, onClose }) => {
                   onClick={() => window.innerWidth < 1024 && onClose()}
                   className={`group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                     active
-                      ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 border-l-4 border-primary-600'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                      ? "bg-primary-50 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 border-l-4 border-primary-600"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <Icon className={`mr-3 h-5 w-5 transition-colors ${
-                    active ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 group-hover:text-gray-500'
-                  }`} />
+                  <Icon
+                    className={`mr-3 h-5 w-5 transition-colors ${
+                      active
+                        ? "text-primary-600 dark:text-primary-400"
+                        : "text-gray-400 group-hover:text-gray-500"
+                    }`}
+                  />
                   <div className="flex-1">
                     <div className="text-sm font-medium">{item.name}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

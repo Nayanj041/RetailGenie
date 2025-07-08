@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
@@ -20,22 +20,26 @@ export function AuthProvider({ children }) {
     if (process.env.REACT_APP_API_URL) {
       return process.env.REACT_APP_API_URL;
     }
-    
+
     // Check if we're in a GitHub Codespace
-    const codespace = process.env.CODESPACE_NAME || window.location.hostname.includes('app.github.dev');
+    const codespace =
+      process.env.CODESPACE_NAME ||
+      window.location.hostname.includes("app.github.dev");
     if (codespace) {
-      const codespaceBase = window.location.hostname.replace('-3001', '-5000').replace('-3000', '-5000');
+      const codespaceBase = window.location.hostname
+        .replace("-3001", "-5000")
+        .replace("-3000", "-5000");
       return `https://${codespaceBase}`;
     }
-    
-    return 'http://127.0.0.1:5000';
+
+    return "http://127.0.0.1:5000";
   };
-  
+
   const API_BASE_URL = getApiBaseUrl();
 
   useEffect(() => {
     // Check for existing token on app start
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       // Validate token with backend
       validateToken(token);
@@ -48,8 +52,8 @@ export function AuthProvider({ children }) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/profile`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
 
@@ -57,11 +61,11 @@ export function AuthProvider({ children }) {
         const userData = await response.json();
         setUser(userData.data);
       } else {
-        localStorage.removeItem('token');
+        localStorage.removeItem("token");
       }
     } catch (error) {
-      console.error('Token validation error:', error);
-      localStorage.removeItem('token');
+      console.error("Token validation error:", error);
+      localStorage.removeItem("token");
     } finally {
       setLoading(false);
     }
@@ -70,35 +74,43 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      
-      console.log('🔄 Starting login request...', { email, API_BASE_URL });
-      
+
+      console.log("🔄 Starting login request...", { email, API_BASE_URL });
+
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
 
-      console.log('📡 Login response received:', { status: response.status, ok: response.ok });
+      console.log("📡 Login response received:", {
+        status: response.status,
+        ok: response.ok,
+      });
 
       const data = await response.json();
-      console.log('📝 Login response data:', data);
+      console.log("📝 Login response data:", data);
 
+<<<<<<< HEAD
       if (response.ok && data.success) {
         localStorage.setItem('token', data.token);
+=======
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+>>>>>>> d39c6b6e (ci/cd resolve)
         setUser(data.user);
-        toast.success('Login successful!');
+        toast.success("Login successful!");
         return { success: true };
       } else {
-        toast.error(data.message || 'Login failed');
+        toast.error(data.message || "Login failed");
         return { success: false, error: data.message };
       }
     } catch (error) {
-      console.error('❌ Login error:', error);
-      toast.error('Unable to connect to server. Please try again later.');
-      return { success: false, error: 'Network error' };
+      console.error("❌ Login error:", error);
+      toast.error("Unable to connect to server. Please try again later.");
+      return { success: false, error: "Network error" };
     } finally {
       setLoading(false);
     }
@@ -107,13 +119,16 @@ export function AuthProvider({ children }) {
   const register = async (formData) => {
     try {
       setLoading(true);
-      
-      console.log('🔄 Starting registration request...', { email: formData.email, API_BASE_URL });
-      
+
+      console.log("🔄 Starting registration request...", {
+        email: formData.email,
+        API_BASE_URL,
+      });
+
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: `${formData.firstName} ${formData.lastName}`,
@@ -121,39 +136,48 @@ export function AuthProvider({ children }) {
           password: formData.password,
           phone: formData.phone,
           userType: formData.userType,
-          business_name: formData.businessName,  // Fix: use business_name instead of businessName
-          businessType: formData.businessType
+          business_name: formData.businessName, // Fix: use business_name instead of businessName
+          businessType: formData.businessType,
         }),
       });
 
-      console.log('📡 Registration response received:', { status: response.status, ok: response.ok });
+      console.log("📡 Registration response received:", {
+        status: response.status,
+        ok: response.ok,
+      });
 
       const data = await response.json();
-      console.log('📝 Registration response data:', data);
+      console.log("📝 Registration response data:", data);
 
+<<<<<<< HEAD
       if (response.ok && data.success) {
         localStorage.setItem('token', data.token);
+=======
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+>>>>>>> d39c6b6e (ci/cd resolve)
         setUser(data.user);
-        toast.success('Registration successful!');
+        toast.success("Registration successful!");
         return { success: true };
       } else {
-        const errorMessage = data.error || data.message || 'Registration failed';
+        const errorMessage =
+          data.error || data.message || "Registration failed";
         toast.error(errorMessage);
         return { success: false, error: errorMessage };
       }
     } catch (error) {
-      console.error('❌ Registration error:', error);
-      toast.error('Unable to connect to server. Please try again later.');
-      return { success: false, error: 'Network error' };
+      console.error("❌ Registration error:", error);
+      toast.error("Unable to connect to server. Please try again later.");
+      return { success: false, error: "Network error" };
     } finally {
       setLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setUser(null);
-    toast.success('Logged out successfully');
+    toast.success("Logged out successfully");
   };
 
   const value = {
@@ -165,9 +189,5 @@ export function AuthProvider({ children }) {
     API_BASE_URL,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

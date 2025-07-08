@@ -1,27 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
-import { Package, TrendingUp, TrendingDown, AlertTriangle, Search, Plus, Edit2, Trash2 } from 'lucide-react';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { useAuth } from '../utils/AuthContext';
-import { api } from '../utils/api';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import {
+  Package,
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  Search,
+  Plus,
+  Edit2,
+  Trash2,
+} from "lucide-react";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../utils/AuthContext";
+import { api } from "../utils/api";
 
 const Inventory = () => {
   const { token } = useAuth();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [predictions, setPredictions] = useState({});
 
   const [newItem, setNewItem] = useState({
-    name: '',
-    sku: '',
-    category: '',
+    name: "",
+    sku: "",
+    category: "",
     quantity: 0,
     price: 0,
-    supplier: '',
-    reorder_level: 0
+    supplier: "",
+    reorder_level: 0,
   });
 
   useEffect(() => {
@@ -32,14 +41,14 @@ const Inventory = () => {
   const fetchInventory = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/inventory', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await api.get("/inventory", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setInventory(response.data.items || []);
     } catch (error) {
-      console.error('Error fetching inventory:', error);
+      console.error("Error fetching inventory:", error);
       setInventory([]);
-      toast.error('Failed to load inventory');
+      toast.error("Failed to load inventory");
     } finally {
       setLoading(false);
     }
@@ -47,84 +56,92 @@ const Inventory = () => {
 
   const fetchPredictions = async () => {
     try {
-      const response = await api.get('/ml/inventory/forecast', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await api.get("/ml/inventory/forecast", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setPredictions(response.data.predictions || {});
     } catch (error) {
-      console.error('Error fetching predictions:', error);
+      console.error("Error fetching predictions:", error);
       setPredictions({});
-      toast.error('Failed to load predictions');
+      toast.error("Failed to load predictions");
     }
   };
 
   const addItem = async () => {
     try {
-      await api.post('/inventory', newItem, {
-        headers: { Authorization: `Bearer ${token}` }
+      await api.post("/inventory", newItem, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       fetchInventory();
       setShowAddModal(false);
       setNewItem({
-        name: '',
-        sku: '',
-        category: '',
+        name: "",
+        sku: "",
+        category: "",
         quantity: 0,
         price: 0,
-        supplier: '',
-        reorder_level: 0
+        supplier: "",
+        reorder_level: 0,
       });
     } catch (error) {
-      console.error('Error adding item:', error);
+      console.error("Error adding item:", error);
     }
   };
 
   const updateItem = async (id, updates) => {
     try {
       await api.put(`/inventory/${id}`, updates, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       fetchInventory();
       setEditingItem(null);
     } catch (error) {
-      console.error('Error updating item:', error);
+      console.error("Error updating item:", error);
     }
   };
 
   const deleteItem = async (id) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    if (window.confirm("Are you sure you want to delete this item?")) {
       try {
         await api.delete(`/inventory/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         fetchInventory();
       } catch (error) {
-        console.error('Error deleting item:', error);
+        console.error("Error deleting item:", error);
       }
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'in_stock': return 'text-green-600 bg-green-100';
-      case 'low_stock': return 'text-yellow-600 bg-yellow-100';
-      case 'out_of_stock': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "in_stock":
+        return "text-green-600 bg-green-100";
+      case "low_stock":
+        return "text-yellow-600 bg-yellow-100";
+      case "out_of_stock":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
   const getTrendIcon = (trend) => {
     switch (trend) {
-      case 'up': return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'down': return <TrendingDown className="h-4 w-4 text-red-500" />;
-      default: return <div className="h-4 w-4 bg-blue-500 rounded-full"></div>;
+      case "up":
+        return <TrendingUp className="h-4 w-4 text-green-500" />;
+      case "down":
+        return <TrendingDown className="h-4 w-4 text-red-500" />;
+      default:
+        return <div className="h-4 w-4 bg-blue-500 rounded-full"></div>;
     }
   };
 
-  const filteredInventory = inventory.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredInventory = inventory.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   if (loading) {
@@ -137,8 +154,12 @@ const Inventory = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Inventory Management</h1>
-            <p className="text-gray-600">Track and manage your product inventory with AI insights</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Inventory Management
+            </h1>
+            <p className="text-gray-600">
+              Track and manage your product inventory with AI insights
+            </p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
@@ -155,42 +176,55 @@ const Inventory = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Items</p>
-                <p className="text-2xl font-bold text-gray-900">{inventory.length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {inventory.length}
+                </p>
               </div>
               <Package className="h-8 w-8 text-blue-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">In Stock</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {inventory.filter(item => item.status === 'in_stock').length}
+                  {
+                    inventory.filter((item) => item.status === "in_stock")
+                      .length
+                  }
                 </p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Low Stock</p>
                 <p className="text-2xl font-bold text-yellow-600">
-                  {inventory.filter(item => item.status === 'low_stock').length}
+                  {
+                    inventory.filter((item) => item.status === "low_stock")
+                      .length
+                  }
                 </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-yellow-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Out of Stock</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Out of Stock
+                </p>
                 <p className="text-2xl font-bold text-red-600">
-                  {inventory.filter(item => item.status === 'out_of_stock').length}
+                  {
+                    inventory.filter((item) => item.status === "out_of_stock")
+                      .length
+                  }
                 </p>
               </div>
               <TrendingDown className="h-8 w-8 text-red-500" />
@@ -250,8 +284,12 @@ const Inventory = () => {
                   return (
                     <tr key={item.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                        <div className="text-sm text-gray-500">{item.supplier}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {item.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {item.supplier}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {item.sku}
@@ -260,15 +298,21 @@ const Inventory = () => {
                         {item.category}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{item.quantity}</div>
-                        <div className="text-xs text-gray-500">Reorder at: {item.reorder_level}</div>
+                        <div className="text-sm text-gray-900">
+                          {item.quantity}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Reorder at: {item.reorder_level}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         ${item.price}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(item.status)}`}>
-                          {item.status.replace('_', ' ')}
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(item.status)}`}
+                        >
+                          {item.status.replace("_", " ")}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -276,10 +320,12 @@ const Inventory = () => {
                           {getTrendIcon(prediction.trend)}
                           <div>
                             <div className="text-sm text-gray-900">
-                              {prediction.predicted_demand || 'N/A'}
+                              {prediction.predicted_demand || "N/A"}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {prediction.confidence ? `${Math.round(prediction.confidence * 100)}% confidence` : ''}
+                              {prediction.confidence
+                                ? `${Math.round(prediction.confidence * 100)}% confidence`
+                                : ""}
                             </div>
                           </div>
                         </div>
@@ -312,34 +358,50 @@ const Inventory = () => {
         {showAddModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
             <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Add New Item</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
+                Add New Item
+              </h3>
               <div className="space-y-4">
                 <input
                   type="text"
                   placeholder="Product Name"
                   value={newItem.name}
-                  onChange={(e) => setNewItem(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setNewItem((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="text"
                   placeholder="SKU"
                   value={newItem.sku}
-                  onChange={(e) => setNewItem(prev => ({ ...prev, sku: e.target.value }))}
+                  onChange={(e) =>
+                    setNewItem((prev) => ({ ...prev, sku: e.target.value }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="text"
                   placeholder="Category"
                   value={newItem.category}
-                  onChange={(e) => setNewItem(prev => ({ ...prev, category: e.target.value }))}
+                  onChange={(e) =>
+                    setNewItem((prev) => ({
+                      ...prev,
+                      category: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="number"
                   placeholder="Quantity"
                   value={newItem.quantity}
-                  onChange={(e) => setNewItem(prev => ({ ...prev, quantity: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setNewItem((prev) => ({
+                      ...prev,
+                      quantity: Number(e.target.value),
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <input
@@ -347,21 +409,36 @@ const Inventory = () => {
                   step="0.01"
                   placeholder="Price"
                   value={newItem.price}
-                  onChange={(e) => setNewItem(prev => ({ ...prev, price: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setNewItem((prev) => ({
+                      ...prev,
+                      price: Number(e.target.value),
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="text"
                   placeholder="Supplier"
                   value={newItem.supplier}
-                  onChange={(e) => setNewItem(prev => ({ ...prev, supplier: e.target.value }))}
+                  onChange={(e) =>
+                    setNewItem((prev) => ({
+                      ...prev,
+                      supplier: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="number"
                   placeholder="Reorder Level"
                   value={newItem.reorder_level}
-                  onChange={(e) => setNewItem(prev => ({ ...prev, reorder_level: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setNewItem((prev) => ({
+                      ...prev,
+                      reorder_level: Number(e.target.value),
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>

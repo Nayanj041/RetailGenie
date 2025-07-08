@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, Store, Zap } from 'lucide-react';
-import { useAuth } from '../utils/AuthContext';
-import LoadingSpinner from '../components/LoadingSpinner';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Mail, Lock, Store, Zap } from "lucide-react";
+import { useAuth } from "../utils/AuthContext";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -15,7 +15,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const result = await login(email, password);
       
@@ -26,7 +26,7 @@ const Login = () => {
         console.error('❌ Login failed');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
@@ -35,22 +35,22 @@ const Login = () => {
   // Demo login function
   const handleDemoLogin = async () => {
     setLoading(true);
-    
+
     try {
-      console.log('🎯 Attempting demo login...');
-      
+      console.log("🎯 Attempting demo login...");
+
       // Use demo credentials
-      const result = await login('demo@retailgenie.com', 'demo123456');
-      
+      const result = await login("demo@retailgenie.com", "demo123456");
+
       if (result?.success !== false) {
-        console.log('✅ Demo login successful, redirecting to dashboard...');
+        console.log("✅ Demo login successful, redirecting to dashboard...");
         // Navigate to dashboard after successful login
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
-        console.log('❌ Demo login failed');
+        console.log("❌ Demo login failed");
       }
     } catch (error) {
-      console.error('Demo login error:', error);
+      console.error("Demo login error:", error);
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,9 @@ const Login = () => {
             <div className="flex items-center space-x-2">
               <Store className="h-12 w-12 text-primary-600" />
               <div>
-                <h1 className="text-3xl font-bold text-gradient">RetailGenie</h1>
+                <h1 className="text-3xl font-bold text-gradient">
+                  RetailGenie
+                </h1>
                 <p className="text-sm text-gray-500">AI Shopping Assistant</p>
               </div>
             </div>
@@ -78,14 +80,14 @@ const Login = () => {
             Sign in to your account
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Or{' '}
+            Or{" "}
             <Link
               to="/register"
               className="font-medium text-primary-600 hover:text-primary-500"
             >
               create a new account
-            </Link>
-            {' '}or{' '}
+            </Link>{" "}
+            or{" "}
             <Link
               to="/"
               className="font-medium text-primary-600 hover:text-primary-500"
@@ -133,7 +135,7 @@ const Login = () => {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   value={password}
@@ -167,7 +169,10 @@ const Login = () => {
                 type="checkbox"
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+              <label
+                htmlFor="remember-me"
+                className="ml-2 block text-sm text-gray-900 dark:text-gray-300"
+              >
                 Remember me
               </label>
             </div>
@@ -189,7 +194,7 @@ const Login = () => {
               disabled={loading}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </div>
 
@@ -202,14 +207,14 @@ const Login = () => {
               className="group relative w-full flex justify-center py-3 px-4 border-2 border-dashed border-yellow-400 text-sm font-medium rounded-lg text-yellow-600 bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               <Zap className="h-4 w-4 mr-2" />
-              {loading ? 'Demo Login...' : '🚀 Demo Login (Direct to Dashboard)'}
+              {loading
+                ? "Demo Login..."
+                : "🚀 Demo Login (Direct to Dashboard)"}
             </button>
             <p className="mt-2 text-xs text-gray-500 text-center">
               Demo credentials: demo@retailgenie.com / demo123456
             </p>
           </div>
-
-
         </form>
       </div>
     </div>

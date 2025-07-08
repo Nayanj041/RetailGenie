@@ -51,7 +51,7 @@ class AuthController:
                 "role": "user",
                 "is_active": True,
                 "created_at": datetime.utcnow().isoformat(),
-                "updated_at": datetime.utcnow().isoformat()
+                "updated_at": datetime.utcnow().isoformat(),
             }
             # Save to Firebase
             user_id = self.firebase.create_document(self.collection_name, user_dict)
@@ -81,7 +81,9 @@ class AuthController:
         """
         try:
             # Find user by email
-            users = self.firebase.query_documents(self.collection_name, "email", "==", email)
+            users = self.firebase.query_documents(
+                self.collection_name, "email", "==", email
+            )
 
             if not users:
                 raise ValueError("Invalid email or password")
@@ -97,16 +99,18 @@ class AuthController:
                 raise ValueError("Account is deactivated")
 
             # Generate JWT token
-            token = self._generate_token(user_data.get("id"), email, user_data.get("role", "user"))
+            token = self._generate_token(
+                user_data.get("id"), email, user_data.get("role", "user")
+            )
 
             # Remove password from response
             user_data.pop("password", None)
 
             # Update last login
             self.firebase.update_document(
-                self.collection_name, 
-                user_data.get("id"), 
-                {"last_login": datetime.utcnow().isoformat()}
+                self.collection_name,
+                user_data.get("id"),
+                {"last_login": datetime.utcnow().isoformat()},
             )
 
             return {"user": user_data, "token": token}

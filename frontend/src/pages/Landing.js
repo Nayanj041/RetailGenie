@@ -1,81 +1,90 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Brain, 
-  BarChart3, 
-  ShoppingCart, 
-  Users, 
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  Brain,
+  BarChart3,
+  ShoppingCart,
+  Users,
   Star,
   CheckCircle,
   Zap,
   Shield,
-  TrendingUp
-} from 'lucide-react';
+  TrendingUp,
+} from "lucide-react";
 
 const Landing = () => {
   const features = [
     {
       icon: Brain,
-      title: 'AI-Powered Assistant',
-      description: 'Get intelligent recommendations and insights powered by advanced machine learning algorithms.'
+      title: "AI-Powered Assistant",
+      description:
+        "Get intelligent recommendations and insights powered by advanced machine learning algorithms.",
     },
     {
       icon: BarChart3,
-      title: 'Advanced Analytics',
-      description: 'Track sales, inventory, and customer behavior with comprehensive real-time analytics.'
+      title: "Advanced Analytics",
+      description:
+        "Track sales, inventory, and customer behavior with comprehensive real-time analytics.",
     },
     {
       icon: ShoppingCart,
-      title: 'Smart Shopping',
-      description: 'Personalized product recommendations and intelligent shopping assistance.'
+      title: "Smart Shopping",
+      description:
+        "Personalized product recommendations and intelligent shopping assistance.",
     },
     {
       icon: Users,
-      title: 'Customer Insights',
-      description: 'Understand your customers better with sentiment analysis and behavior tracking.'
+      title: "Customer Insights",
+      description:
+        "Understand your customers better with sentiment analysis and behavior tracking.",
     },
     {
       icon: TrendingUp,
-      title: 'Inventory Forecasting',
-      description: 'Predict demand and optimize inventory levels with AI-powered forecasting.'
+      title: "Inventory Forecasting",
+      description:
+        "Predict demand and optimize inventory levels with AI-powered forecasting.",
     },
     {
       icon: Zap,
-      title: 'Dynamic Pricing',
-      description: 'Optimize pricing strategies with intelligent pricing recommendations.'
-    }
+      title: "Dynamic Pricing",
+      description:
+        "Optimize pricing strategies with intelligent pricing recommendations.",
+    },
   ];
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
-      role: 'Store Manager',
-      company: 'Fashion Forward',
-      content: 'RetailGenie transformed our inventory management. We reduced stockouts by 40% and increased profits by 25%.',
-      rating: 5
+      name: "Sarah Johnson",
+      role: "Store Manager",
+      company: "Fashion Forward",
+      content:
+        "RetailGenie transformed our inventory management. We reduced stockouts by 40% and increased profits by 25%.",
+      rating: 5,
     },
     {
-      name: 'Mike Chen',
-      role: 'E-commerce Director',
-      company: 'TechGear Plus',
-      content: 'The AI recommendations are spot-on. Our customers love the personalized shopping experience.',
-      rating: 5
+      name: "Mike Chen",
+      role: "E-commerce Director",
+      company: "TechGear Plus",
+      content:
+        "The AI recommendations are spot-on. Our customers love the personalized shopping experience.",
+      rating: 5,
     },
     {
-      name: 'Lisa Rodriguez',
-      role: 'Business Owner',
-      company: 'Artisan Crafts',
-      content: 'The analytics dashboard gives me insights I never had before. Game-changer for small businesses!',
-      rating: 5
-    }
+      name: "Lisa Rodriguez",
+      role: "Business Owner",
+      company: "Artisan Crafts",
+      content:
+        "The analytics dashboard gives me insights I never had before. Game-changer for small businesses!",
+      rating: 5,
+    },
   ];
 
   const stats = [
-    { number: '500+', label: 'Businesses Served' },
-    { number: '40%', label: 'Average Sales Increase' },
-    { number: '60%', label: 'Inventory Optimization' },
-    { number: '24/7', label: 'AI Support' }
+    { number: "500+", label: "Businesses Served" },
+    { number: "40%", label: "Average Sales Increase" },
+    { number: "60%", label: "Inventory Optimization" },
+    { number: "24/7", label: "AI Support" },
   ];
 
   return (
@@ -88,7 +97,9 @@ const Landing = () => {
               <div className="bg-blue-600 p-2 rounded-lg">
                 <Brain className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">RetailGenie</span>
+              <span className="text-xl font-bold text-gray-900">
+                RetailGenie
+              </span>
             </div>
             <div className="flex items-center space-x-4">
               <Link
@@ -117,8 +128,9 @@ const Landing = () => {
               <span className="text-yellow-300"> AI Intelligence</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-              Boost sales, optimize inventory, and deliver personalized shopping experiences 
-              with our advanced AI-powered retail management platform.
+              Boost sales, optimize inventory, and deliver personalized shopping
+              experiences with our advanced AI-powered retail management
+              platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
@@ -148,7 +160,9 @@ const Landing = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat, index) => (
               <div key={index} className="bg-white p-6 rounded-lg shadow-md">
-                <div className="text-3xl font-bold text-blue-600 mb-2">{stat.number}</div>
+                <div className="text-3xl font-bold text-blue-600 mb-2">
+                  {stat.number}
+                </div>
                 <div className="text-gray-600">{stat.label}</div>
               </div>
             ))}
@@ -164,20 +178,26 @@ const Landing = () => {
               Everything You Need to Succeed
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Our comprehensive platform combines AI intelligence with practical retail tools
-              to help you make smarter decisions and grow your business.
+              Our comprehensive platform combines AI intelligence with practical
+              retail tools to help you make smarter decisions and grow your
+              business.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <div key={index} className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+                <div
+                  key={index}
+                  className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+                >
                   <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
                     <Icon className="h-6 w-6 text-blue-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    {feature.title}
+                  </h3>
                   <p className="text-gray-600">{feature.description}</p>
                 </div>
               );
@@ -194,7 +214,8 @@ const Landing = () => {
               Ready to Transform Your Business?
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Join thousands of retailers who trust RetailGenie to manage their inventory and analytics
+              Join thousands of retailers who trust RetailGenie to manage their
+              inventory and analytics
             </p>
             <Link
               to="/register"
@@ -218,23 +239,35 @@ const Landing = () => {
               Loved by Businesses Worldwide
             </h2>
             <p className="text-xl text-gray-600">
-              Join thousands of retailers who have transformed their business with RetailGenie
+              Join thousands of retailers who have transformed their business
+              with RetailGenie
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <div key={index} className="bg-white p-8 rounded-xl shadow-lg">
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    <Star
+                      key={i}
+                      className="h-5 w-5 text-yellow-400 fill-current"
+                    />
                   ))}
                 </div>
-                <p className="text-gray-600 mb-6 italic">"{testimonial.content}"</p>
+                <p className="text-gray-600 mb-6 italic">
+                  "{testimonial.content}"
+                </p>
                 <div>
-                  <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                  <div className="text-sm text-gray-600">{testimonial.role}</div>
-                  <div className="text-sm text-gray-500">{testimonial.company}</div>
+                  <div className="font-semibold text-gray-900">
+                    {testimonial.name}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {testimonial.role}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {testimonial.company}
+                  </div>
                 </div>
               </div>
             ))}
@@ -249,7 +282,8 @@ const Landing = () => {
             Ready to Transform Your Business?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Join thousands of retailers using AI to boost sales and optimize operations.
+            Join thousands of retailers using AI to boost sales and optimize
+            operations.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -284,31 +318,68 @@ const Landing = () => {
                 <span className="text-xl font-bold">RetailGenie</span>
               </div>
               <p className="text-gray-400">
-                AI-powered retail management platform helping businesses grow smarter.
+                AI-powered retail management platform helping businesses grow
+                smarter.
               </p>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/features" className="hover:text-white">Features</Link></li>
-                <li><Link to="/pricing" className="hover:text-white">Pricing</Link></li>
-                <li><Link to="/documentation" className="hover:text-white">Documentation</Link></li>
+                <li>
+                  <Link to="/features" className="hover:text-white">
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/pricing" className="hover:text-white">
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/documentation" className="hover:text-white">
+                    Documentation
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/help" className="hover:text-white">Help Center</Link></li>
-                <li><Link to="/contact" className="hover:text-white">Contact Us</Link></li>
-                <li><Link to="/docs" className="hover:text-white">Documentation</Link></li>
+                <li>
+                  <Link to="/help" className="hover:text-white">
+                    Help Center
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="hover:text-white">
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/docs" className="hover:text-white">
+                    Documentation
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/about" className="hover:text-white">About</Link></li>
-                <li><Link to="/careers" className="hover:text-white">Careers</Link></li>
-                <li><Link to="/privacy" className="hover:text-white">Privacy</Link></li>
+                <li>
+                  <Link to="/about" className="hover:text-white">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/careers" className="hover:text-white">
+                    Careers
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="hover:text-white">
+                    Privacy
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

@@ -16,7 +16,7 @@ class AnalyticsController:
     def __init__(self):
         """Initialize Analytics Controller"""
         self.firebase = FirebaseUtils()
-        
+
     def get_dashboard_stats(self) -> Dict[str, Any]:
         """Get dashboard statistics"""
         try:
@@ -29,16 +29,16 @@ class AnalyticsController:
                 "revenue_growth": 15.2,
                 "order_growth": 8.7,
                 "customer_growth": 12.1,
-                "generated_at": datetime.now().isoformat()
+                "generated_at": datetime.now().isoformat(),
             }
-            
+
             logger.info("Dashboard stats retrieved successfully")
             return {"success": True, "data": stats}
-            
+
         except Exception as e:
             logger.error(f"Error getting dashboard stats: {str(e)}")
             return {"success": False, "error": str(e)}
-    
+
     def get_sales_analytics(self, period: str = "30d") -> Dict[str, Any]:
         """Get sales analytics for specified period"""
         try:
@@ -55,16 +55,16 @@ class AnalyticsController:
                 "top_products": [
                     {"name": "Premium Coffee", "revenue": 2345.67, "units_sold": 45},
                     {"name": "Organic Tea", "revenue": 1876.32, "units_sold": 32},
-                ]
+                ],
             }
-            
+
             logger.info(f"Sales analytics retrieved for period: {period}")
             return {"success": True, "data": sales_data}
-            
+
         except Exception as e:
             logger.error(f"Error getting sales analytics: {str(e)}")
             return {"success": False, "error": str(e)}
-    
+
     def get_customer_analytics(self) -> Dict[str, Any]:
         """Get customer analytics"""
         try:
@@ -78,16 +78,16 @@ class AnalyticsController:
                     {"segment": "Premium", "count": 23, "percentage": 25.8},
                     {"segment": "Regular", "count": 45, "percentage": 50.6},
                     {"segment": "New", "count": 21, "percentage": 23.6},
-                ]
+                ],
             }
-            
+
             logger.info("Customer analytics retrieved successfully")
             return {"success": True, "data": customer_data}
-            
+
         except Exception as e:
             logger.error(f"Error getting customer analytics: {str(e)}")
             return {"success": False, "error": str(e)}
-    
+
     def get_product_performance(self) -> Dict[str, Any]:
         """Get product performance analytics"""
         try:
@@ -99,30 +99,32 @@ class AnalyticsController:
                         "name": "Premium Coffee Beans",
                         "revenue": 2345.67,
                         "units_sold": 45,
-                        "profit_margin": 35.2
+                        "profit_margin": 35.2,
                     },
                     {
-                        "id": "prod_002", 
+                        "id": "prod_002",
                         "name": "Organic Tea Set",
                         "revenue": 1876.32,
                         "units_sold": 32,
-                        "profit_margin": 42.1
-                    }
+                        "profit_margin": 42.1,
+                    },
                 ],
                 "low_stock_alerts": [
                     {"id": "prod_005", "name": "Specialty Honey", "stock": 5},
-                    {"id": "prod_012", "name": "Artisan Bread", "stock": 3}
-                ]
+                    {"id": "prod_012", "name": "Artisan Bread", "stock": 3},
+                ],
             }
-            
+
             logger.info("Product performance analytics retrieved successfully")
             return {"success": True, "data": product_data}
-            
+
         except Exception as e:
             logger.error(f"Error getting product performance: {str(e)}")
             return {"success": False, "error": str(e)}
-    
-    def record_event(self, event_type: str, event_data: Dict[str, Any]) -> Dict[str, Any]:
+
+    def record_event(
+        self, event_type: str, event_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Record an analytics event"""
         try:
             event = {
@@ -130,25 +132,27 @@ class AnalyticsController:
                 "data": event_data,
                 "timestamp": datetime.now().isoformat(),
                 "user_agent": event_data.get("user_agent", ""),
-                "ip_address": event_data.get("ip_address", "")
+                "ip_address": event_data.get("ip_address", ""),
             }
-            
+
             # Store in Firebase
             doc_id = self.firebase.create_document("analytics_events", event)
-            
+
             logger.info(f"Analytics event recorded: {event_type}")
             return {"success": True, "event_id": doc_id}
-            
+
         except Exception as e:
             logger.error(f"Error recording analytics event: {str(e)}")
             return {"success": False, "error": str(e)}
-    
-    def get_dashboard_analytics(self, store_id: Optional[str] = None, date_range: str = "7d") -> Dict[str, Any]:
+
+    def get_dashboard_analytics(
+        self, store_id: Optional[str] = None, date_range: str = "7d"
+    ) -> Dict[str, Any]:
         """Get dashboard analytics data"""
         try:
             # Get base dashboard stats
             base_stats = self.get_dashboard_stats()
-            
+
             # Enhanced analytics with date range filtering
             dashboard_data = {
                 "overview": base_stats.get("data", {}),
@@ -164,32 +168,44 @@ class AnalyticsController:
                     {"date": "2025-07-01", "sales": 1876.54, "orders": 24},
                 ],
                 "top_categories": [
-                    {"name": "Coffee & Beverages", "revenue": 4567.89, "percentage": 35.2},
+                    {
+                        "name": "Coffee & Beverages",
+                        "revenue": 4567.89,
+                        "percentage": 35.2,
+                    },
                     {"name": "Organic Foods", "revenue": 3421.56, "percentage": 26.4},
                     {"name": "Bakery Items", "revenue": 2987.34, "percentage": 23.1},
-                    {"name": "Health & Wellness", "revenue": 1987.65, "percentage": 15.3}
+                    {
+                        "name": "Health & Wellness",
+                        "revenue": 1987.65,
+                        "percentage": 15.3,
+                    },
                 ],
                 "performance_metrics": {
                     "conversion_rate": 3.4,
                     "average_basket_size": 78.90,
                     "customer_satisfaction": 4.2,
-                    "inventory_turnover": 2.8
-                }
+                    "inventory_turnover": 2.8,
+                },
             }
-            
-            logger.info(f"Dashboard analytics retrieved for store: {store_id}, range: {date_range}")
+
+            logger.info(
+                f"Dashboard analytics retrieved for store: {store_id}, range: {date_range}"
+            )
             return dashboard_data
-            
+
         except Exception as e:
             logger.error(f"Error getting dashboard analytics: {str(e)}")
             raise
-    
-    def get_customer_insights(self, store_id: Optional[str] = None, segment: str = "all") -> Dict[str, Any]:
+
+    def get_customer_insights(
+        self, store_id: Optional[str] = None, segment: str = "all"
+    ) -> Dict[str, Any]:
         """Get customer behavior insights"""
         try:
             # Get base customer analytics
             base_data = self.get_customer_analytics()
-            
+
             insights = {
                 "store_id": store_id,
                 "segment": segment,
@@ -199,40 +215,52 @@ class AnalyticsController:
                         {"hour": "09:00", "traffic": 75},
                         {"hour": "12:00", "traffic": 120},
                         {"hour": "17:00", "traffic": 95},
-                        {"hour": "19:00", "traffic": 85}
+                        {"hour": "19:00", "traffic": 85},
                     ],
                     "preferred_categories": [
                         {"category": "Coffee & Beverages", "percentage": 42.3},
                         {"category": "Organic Foods", "percentage": 38.7},
-                        {"category": "Bakery Items", "percentage": 31.2}
+                        {"category": "Bakery Items", "percentage": 31.2},
                     ],
                     "shopping_frequency": {
                         "daily": 15.2,
                         "weekly": 45.6,
                         "monthly": 32.1,
-                        "occasional": 7.1
-                    }
+                        "occasional": 7.1,
+                    },
                 },
                 "segmentation": {
-                    "high_value": {"count": 23, "avg_spend": 125.67, "frequency": "weekly"},
-                    "regular": {"count": 45, "avg_spend": 78.34, "frequency": "bi-weekly"},
-                    "new": {"count": 21, "avg_spend": 45.23, "frequency": "monthly"}
+                    "high_value": {
+                        "count": 23,
+                        "avg_spend": 125.67,
+                        "frequency": "weekly",
+                    },
+                    "regular": {
+                        "count": 45,
+                        "avg_spend": 78.34,
+                        "frequency": "bi-weekly",
+                    },
+                    "new": {"count": 21, "avg_spend": 45.23, "frequency": "monthly"},
                 },
                 "recommendations": [
                     "Implement loyalty program for high-value customers",
                     "Create targeted promotions for regular customers",
-                    "Develop onboarding campaigns for new customers"
-                ]
+                    "Develop onboarding campaigns for new customers",
+                ],
             }
-            
-            logger.info(f"Customer insights retrieved for store: {store_id}, segment: {segment}")
+
+            logger.info(
+                f"Customer insights retrieved for store: {store_id}, segment: {segment}"
+            )
             return insights
-            
+
         except Exception as e:
             logger.error(f"Error getting customer insights: {str(e)}")
             raise
-    
-    def get_manager_performance(self, manager_id: Optional[str] = None, period: str = "month") -> Dict[str, Any]:
+
+    def get_manager_performance(
+        self, manager_id: Optional[str] = None, period: str = "month"
+    ) -> Dict[str, Any]:
         """Get manager performance metrics"""
         try:
             performance = {
@@ -243,67 +271,74 @@ class AnalyticsController:
                     "customer_satisfaction_score": 4.3,
                     "team_productivity": 92.1,
                     "inventory_accuracy": 98.7,
-                    "staff_engagement": 87.4
+                    "staff_engagement": 87.4,
                 },
                 "kpis": {
                     "total_sales": 15678.90,
                     "sales_target": 14500.00,
                     "orders_processed": 234,
                     "customer_complaints": 3,
-                    "staff_turnover": 5.2
+                    "staff_turnover": 5.2,
                 },
                 "achievements": [
                     "Exceeded monthly sales target by 8.5%",
                     "Maintained customer satisfaction above 4.0",
                     "Zero safety incidents this period",
-                    "Implemented new inventory tracking system"
+                    "Implemented new inventory tracking system",
                 ],
                 "areas_for_improvement": [
                     "Reduce customer wait times during peak hours",
                     "Improve staff product knowledge training",
-                    "Optimize inventory ordering processes"
+                    "Optimize inventory ordering processes",
                 ],
                 "team_performance": {
                     "total_staff": 8,
                     "attendance_rate": 96.2,
                     "training_completion": 87.5,
-                    "sales_per_employee": 1959.86
+                    "sales_per_employee": 1959.86,
                 },
                 "comparison": {
                     "vs_last_period": {
                         "sales": "+12.3%",
                         "satisfaction": "+0.2 points",
-                        "productivity": "+5.7%"
+                        "productivity": "+5.7%",
                     },
                     "vs_regional_average": {
                         "sales": "+15.8%",
                         "satisfaction": "+0.5 points",
-                        "efficiency": "+8.2%"
-                    }
-                }
+                        "efficiency": "+8.2%",
+                    },
+                },
             }
-            
-            logger.info(f"Manager performance retrieved for manager: {manager_id}, period: {period}")
+
+            logger.info(
+                f"Manager performance retrieved for manager: {manager_id}, period: {period}"
+            )
             return performance
-            
+
         except Exception as e:
             logger.error(f"Error getting manager performance: {str(e)}")
             raise
-    
-    def generate_analytics_report(self, report_type: str = "daily", store_id: Optional[str] = None, email_recipients: List[str] = None) -> str:
+
+    def generate_analytics_report(
+        self,
+        report_type: str = "daily",
+        store_id: Optional[str] = None,
+        email_recipients: List[str] = None,
+    ) -> str:
         """Generate analytics report"""
         try:
             if email_recipients is None:
                 email_recipients = []
-            
+
             # Generate report data based on type
             report_data = {
                 "report_type": report_type,
                 "store_id": store_id,
                 "generated_at": datetime.now().isoformat(),
-                "data": {}
+                "data": {},
             }
-            
+
             if report_type == "daily":
                 report_data["data"] = {
                     "daily_sales": 1876.54,
@@ -311,8 +346,8 @@ class AnalyticsController:
                     "daily_customers": 18,
                     "top_products": [
                         {"name": "Premium Coffee", "units": 12, "revenue": 234.56},
-                        {"name": "Organic Croissant", "units": 8, "revenue": 156.78}
-                    ]
+                        {"name": "Organic Croissant", "units": 8, "revenue": 156.78},
+                    ],
                 }
             elif report_type == "weekly":
                 report_data["data"] = {
@@ -321,36 +356,37 @@ class AnalyticsController:
                     "weekly_customers": 89,
                     "growth_metrics": {
                         "sales_growth": "+12.5%",
-                        "customer_growth": "+8.7%"
-                    }
+                        "customer_growth": "+8.7%",
+                    },
                 }
             elif report_type == "monthly":
                 report_data["data"] = {
                     "monthly_sales": 45678.90,
                     "monthly_orders": 567,
                     "monthly_customers": 234,
-                    "profitability": {
-                        "gross_margin": 34.2,
-                        "net_profit": 8765.43
-                    }
+                    "profitability": {"gross_margin": 34.2, "net_profit": 8765.43},
                 }
-            
+
             # Generate report file path
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             report_filename = f"analytics_report_{report_type}_{timestamp}.pdf"
             report_path = f"/tmp/reports/{report_filename}"
-            
+
             # In a real implementation, generate actual PDF here
             # For now, just return the path
-            
-            logger.info(f"Analytics report generated: {report_type} for store: {store_id}")
+
+            logger.info(
+                f"Analytics report generated: {report_type} for store: {store_id}"
+            )
             return report_path
-            
+
         except Exception as e:
             logger.error(f"Error generating analytics report: {str(e)}")
             raise
-    
-    def get_gamification_leaderboard(self, region: Optional[str] = None, period: str = "month") -> Dict[str, Any]:
+
+    def get_gamification_leaderboard(
+        self, region: Optional[str] = None, period: str = "month"
+    ) -> Dict[str, Any]:
         """Get manager gamification leaderboard"""
         try:
             leaderboard = {
@@ -368,12 +404,12 @@ class AnalyticsController:
                         "achievements": {
                             "sales_target": 115.2,
                             "satisfaction_score": 4.7,
-                            "team_performance": 96.8
-                        }
+                            "team_performance": 96.8,
+                        },
                     },
                     {
                         "rank": 2,
-                        "manager_id": "mgr_002", 
+                        "manager_id": "mgr_002",
                         "manager_name": "Michael Chen",
                         "store_name": "Mall Location",
                         "points": 2230,
@@ -381,8 +417,8 @@ class AnalyticsController:
                         "achievements": {
                             "sales_target": 108.7,
                             "satisfaction_score": 4.5,
-                            "team_performance": 94.2
-                        }
+                            "team_performance": 94.2,
+                        },
                     },
                     {
                         "rank": 3,
@@ -394,8 +430,8 @@ class AnalyticsController:
                         "achievements": {
                             "sales_target": 106.3,
                             "satisfaction_score": 4.6,
-                            "team_performance": 91.5
-                        }
+                            "team_performance": 91.5,
+                        },
                     },
                     {
                         "rank": 4,
@@ -407,35 +443,37 @@ class AnalyticsController:
                         "achievements": {
                             "sales_target": 102.1,
                             "satisfaction_score": 4.3,
-                            "team_performance": 89.7
-                        }
-                    }
+                            "team_performance": 89.7,
+                        },
+                    },
                 ],
                 "metrics": {
                     "total_participants": 12,
                     "average_score": 2140.5,
                     "top_badge": "Sales Champion",
-                    "improvement_rate": "+15.3%"
+                    "improvement_rate": "+15.3%",
                 },
                 "challenges": [
                     {
                         "name": "Customer Satisfaction Challenge",
                         "description": "Achieve 4.5+ customer rating",
                         "reward": "250 points",
-                        "deadline": "2025-07-31"
+                        "deadline": "2025-07-31",
                     },
                     {
                         "name": "Sales Growth Sprint",
                         "description": "Increase sales by 10% over last month",
                         "reward": "500 points",
-                        "deadline": "2025-07-31"
-                    }
-                ]
+                        "deadline": "2025-07-31",
+                    },
+                ],
             }
-            
-            logger.info(f"Gamification leaderboard retrieved for region: {region}, period: {period}")
+
+            logger.info(
+                f"Gamification leaderboard retrieved for region: {region}, period: {period}"
+            )
             return leaderboard
-            
+
         except Exception as e:
             logger.error(f"Error getting gamification leaderboard: {str(e)}")
             raise

@@ -1,39 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
-import { User, Mail, Phone, MapPin, Save, Edit2, Camera, Shield, Bell, Globe } from 'lucide-react';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { useAuth } from '../utils/AuthContext';
-import { api } from '../utils/api';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Save,
+  Edit2,
+  Camera,
+  Shield,
+  Bell,
+  Globe,
+} from "lucide-react";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../utils/AuthContext";
+import { api } from "../utils/api";
 
 const Profile = () => {
   const { user, token, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState('profile');
-  
+  const [activeTab, setActiveTab] = useState("profile");
+
   const [profile, setProfile] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    bio: '',
-    avatar: '',
-    role: 'user'
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    bio: "",
+    avatar: "",
+    role: "user",
   });
 
   const [preferences, setPreferences] = useState({
     email_notifications: true,
     push_notifications: true,
     marketing_emails: false,
-    theme: 'light',
-    language: 'en',
-    currency: 'USD'
+    theme: "light",
+    language: "en",
+    currency: "USD",
   });
 
   const [passwordForm, setPasswordForm] = useState({
-    current_password: '',
-    new_password: '',
-    confirm_password: ''
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
   });
 
   useEffect(() => {
@@ -44,22 +55,22 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/profile', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await api.get("/profile", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setProfile(response.data.profile);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error("Error fetching profile:", error);
       setProfile({
-        name: user?.name || 'User',
-        email: user?.email || '',
-        phone: '',
-        address: '',
-        bio: '',
-        avatar: 'https://via.placeholder.com/150',
-        role: user?.role || 'customer'
+        name: user?.name || "User",
+        email: user?.email || "",
+        phone: "",
+        address: "",
+        bio: "",
+        avatar: "https://via.placeholder.com/150",
+        role: user?.role || "customer",
       });
-      toast.error('Failed to load profile data');
+      toast.error("Failed to load profile data");
     } finally {
       setLoading(false);
     }
@@ -67,25 +78,25 @@ const Profile = () => {
 
   const fetchPreferences = async () => {
     try {
-      const response = await api.get('/profile/preferences', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await api.get("/profile/preferences", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setPreferences(response.data.preferences);
     } catch (error) {
-      console.error('Error fetching preferences:', error);
+      console.error("Error fetching preferences:", error);
     }
   };
 
   const saveProfile = async () => {
     try {
       setLoading(true);
-      await api.put('/profile', profile, {
-        headers: { Authorization: `Bearer ${token}` }
+      await api.put("/profile", profile, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       updateUser({ ...user, name: profile.name, email: profile.email });
       setEditing(false);
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error("Error saving profile:", error);
     } finally {
       setLoading(false);
     }
@@ -93,62 +104,66 @@ const Profile = () => {
 
   const savePreferences = async () => {
     try {
-      await api.put('/profile/preferences', preferences, {
-        headers: { Authorization: `Bearer ${token}` }
+      await api.put("/profile/preferences", preferences, {
+        headers: { Authorization: `Bearer ${token}` },
       });
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      console.error("Error saving preferences:", error);
     }
   };
 
   const changePassword = async () => {
     if (passwordForm.new_password !== passwordForm.confirm_password) {
-      alert('New passwords do not match');
+      alert("New passwords do not match");
       return;
     }
 
     try {
-      await api.put('/profile/password', {
-        current_password: passwordForm.current_password,
-        new_password: passwordForm.new_password
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
+      await api.put(
+        "/profile/password",
+        {
+          current_password: passwordForm.current_password,
+          new_password: passwordForm.new_password,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
       setPasswordForm({
-        current_password: '',
-        new_password: '',
-        confirm_password: ''
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
       });
-      
-      alert('Password changed successfully');
+
+      alert("Password changed successfully");
     } catch (error) {
-      console.error('Error changing password:', error);
+      console.error("Error changing password:", error);
     }
   };
 
   const uploadAvatar = async (file) => {
     const formData = new FormData();
-    formData.append('avatar', file);
+    formData.append("avatar", file);
 
     try {
-      const response = await api.post('/profile/avatar', formData, {
+      const response = await api.post("/profile/avatar", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
-      setProfile(prev => ({ ...prev, avatar: response.data.avatar_url }));
+      setProfile((prev) => ({ ...prev, avatar: response.data.avatar_url }));
     } catch (error) {
-      console.error('Error uploading avatar:', error);
+      console.error("Error uploading avatar:", error);
     }
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'security', label: 'Security', icon: Shield },
-    { id: 'preferences', label: 'Preferences', icon: Bell },
-    { id: 'settings', label: 'Settings', icon: Globe }
+    { id: "profile", label: "Profile", icon: User },
+    { id: "security", label: "Security", icon: Shield },
+    { id: "preferences", label: "Preferences", icon: Bell },
+    { id: "settings", label: "Settings", icon: Globe },
   ];
 
   if (loading && !profile.name) {
@@ -161,7 +176,9 @@ const Profile = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-          <p className="text-gray-600">Manage your account settings and preferences</p>
+          <p className="text-gray-600">
+            Manage your account settings and preferences
+          </p>
         </div>
 
         {/* Profile Card */}
@@ -178,13 +195,17 @@ const Profile = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => e.target.files[0] && uploadAvatar(e.target.files[0])}
+                  onChange={(e) =>
+                    e.target.files[0] && uploadAvatar(e.target.files[0])
+                  }
                   className="hidden"
                 />
               </label>
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900">{profile.name}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {profile.name}
+              </h2>
               <p className="text-gray-600">{profile.email}</p>
               <p className="text-sm text-gray-500 capitalize">{profile.role}</p>
             </div>
@@ -193,7 +214,7 @@ const Profile = () => {
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >
               <Edit2 className="h-4 w-4 mr-2" />
-              {editing ? 'Cancel' : 'Edit Profile'}
+              {editing ? "Cancel" : "Edit Profile"}
             </button>
           </div>
         </div>
@@ -210,8 +231,8 @@ const Profile = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
                       activeTab === tab.id
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                     }`}
                   >
                     <Icon className="h-4 w-4 mr-2" />
@@ -224,7 +245,7 @@ const Profile = () => {
 
           <div className="p-6">
             {/* Profile Tab */}
-            {activeTab === 'profile' && (
+            {activeTab === "profile" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -236,10 +257,15 @@ const Profile = () => {
                       <input
                         type="text"
                         value={profile.name}
-                        onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
+                        onChange={(e) =>
+                          setProfile((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                          }))
+                        }
                         disabled={!editing}
                         className={`pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          !editing ? 'bg-gray-50' : ''
+                          !editing ? "bg-gray-50" : ""
                         }`}
                       />
                     </div>
@@ -254,10 +280,15 @@ const Profile = () => {
                       <input
                         type="email"
                         value={profile.email}
-                        onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
+                        onChange={(e) =>
+                          setProfile((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
                         disabled={!editing}
                         className={`pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          !editing ? 'bg-gray-50' : ''
+                          !editing ? "bg-gray-50" : ""
                         }`}
                       />
                     </div>
@@ -272,10 +303,15 @@ const Profile = () => {
                       <input
                         type="tel"
                         value={profile.phone}
-                        onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+                        onChange={(e) =>
+                          setProfile((prev) => ({
+                            ...prev,
+                            phone: e.target.value,
+                          }))
+                        }
                         disabled={!editing}
                         className={`pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          !editing ? 'bg-gray-50' : ''
+                          !editing ? "bg-gray-50" : ""
                         }`}
                       />
                     </div>
@@ -290,10 +326,15 @@ const Profile = () => {
                       <input
                         type="text"
                         value={profile.address}
-                        onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
+                        onChange={(e) =>
+                          setProfile((prev) => ({
+                            ...prev,
+                            address: e.target.value,
+                          }))
+                        }
                         disabled={!editing}
                         className={`pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          !editing ? 'bg-gray-50' : ''
+                          !editing ? "bg-gray-50" : ""
                         }`}
                       />
                     </div>
@@ -306,11 +347,13 @@ const Profile = () => {
                   </label>
                   <textarea
                     value={profile.bio}
-                    onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((prev) => ({ ...prev, bio: e.target.value }))
+                    }
                     disabled={!editing}
                     rows={3}
                     className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      !editing ? 'bg-gray-50' : ''
+                      !editing ? "bg-gray-50" : ""
                     }`}
                     placeholder="Tell us about yourself..."
                   />
@@ -324,7 +367,7 @@ const Profile = () => {
                       className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
                     >
                       <Save className="h-4 w-4 mr-2" />
-                      {loading ? 'Saving...' : 'Save Changes'}
+                      {loading ? "Saving..." : "Save Changes"}
                     </button>
                   </div>
                 )}
@@ -332,10 +375,12 @@ const Profile = () => {
             )}
 
             {/* Security Tab */}
-            {activeTab === 'security' && (
+            {activeTab === "security" && (
               <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
-                
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Change Password
+                </h3>
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -344,7 +389,12 @@ const Profile = () => {
                     <input
                       type="password"
                       value={passwordForm.current_password}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, current_password: e.target.value }))}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({
+                          ...prev,
+                          current_password: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -356,7 +406,12 @@ const Profile = () => {
                     <input
                       type="password"
                       value={passwordForm.new_password}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, new_password: e.target.value }))}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({
+                          ...prev,
+                          new_password: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -368,7 +423,12 @@ const Profile = () => {
                     <input
                       type="password"
                       value={passwordForm.confirm_password}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm_password: e.target.value }))}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({
+                          ...prev,
+                          confirm_password: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -384,21 +444,32 @@ const Profile = () => {
             )}
 
             {/* Preferences Tab */}
-            {activeTab === 'preferences' && (
+            {activeTab === "preferences" && (
               <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-900">Notification Preferences</h3>
-                
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Notification Preferences
+                </h3>
+
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-gray-900">Email Notifications</p>
-                      <p className="text-sm text-gray-600">Receive notifications via email</p>
+                      <p className="font-medium text-gray-900">
+                        Email Notifications
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Receive notifications via email
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         checked={preferences.email_notifications}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, email_notifications: e.target.checked }))}
+                        onChange={(e) =>
+                          setPreferences((prev) => ({
+                            ...prev,
+                            email_notifications: e.target.checked,
+                          }))
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -407,14 +478,23 @@ const Profile = () => {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-gray-900">Push Notifications</p>
-                      <p className="text-sm text-gray-600">Receive push notifications in browser</p>
+                      <p className="font-medium text-gray-900">
+                        Push Notifications
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Receive push notifications in browser
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         checked={preferences.push_notifications}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, push_notifications: e.target.checked }))}
+                        onChange={(e) =>
+                          setPreferences((prev) => ({
+                            ...prev,
+                            push_notifications: e.target.checked,
+                          }))
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -423,14 +503,23 @@ const Profile = () => {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-gray-900">Marketing Emails</p>
-                      <p className="text-sm text-gray-600">Receive promotional and marketing emails</p>
+                      <p className="font-medium text-gray-900">
+                        Marketing Emails
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Receive promotional and marketing emails
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         checked={preferences.marketing_emails}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, marketing_emails: e.target.checked }))}
+                        onChange={(e) =>
+                          setPreferences((prev) => ({
+                            ...prev,
+                            marketing_emails: e.target.checked,
+                          }))
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -448,10 +537,12 @@ const Profile = () => {
             )}
 
             {/* Settings Tab */}
-            {activeTab === 'settings' && (
+            {activeTab === "settings" && (
               <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-900">Application Settings</h3>
-                
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Application Settings
+                </h3>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -459,7 +550,12 @@ const Profile = () => {
                     </label>
                     <select
                       value={preferences.theme}
-                      onChange={(e) => setPreferences(prev => ({ ...prev, theme: e.target.value }))}
+                      onChange={(e) =>
+                        setPreferences((prev) => ({
+                          ...prev,
+                          theme: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="light">Light</option>
@@ -474,7 +570,12 @@ const Profile = () => {
                     </label>
                     <select
                       value={preferences.language}
-                      onChange={(e) => setPreferences(prev => ({ ...prev, language: e.target.value }))}
+                      onChange={(e) =>
+                        setPreferences((prev) => ({
+                          ...prev,
+                          language: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="en">English</option>
@@ -490,7 +591,12 @@ const Profile = () => {
                     </label>
                     <select
                       value={preferences.currency}
-                      onChange={(e) => setPreferences(prev => ({ ...prev, currency: e.target.value }))}
+                      onChange={(e) =>
+                        setPreferences((prev) => ({
+                          ...prev,
+                          currency: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="USD">USD ($)</option>
