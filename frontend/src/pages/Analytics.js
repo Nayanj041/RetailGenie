@@ -42,10 +42,8 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/analytics?time_range=${timeRange}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setAnalytics(response.data);
+      const response = await api.get(`/api/v1/analytics?time_range=${timeRange}`);
+      setAnalytics(response.data || response);
     } catch (error) {
       console.error("Error fetching analytics:", error);
       setAnalytics({

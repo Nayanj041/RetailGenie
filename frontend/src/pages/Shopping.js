@@ -46,8 +46,8 @@ const Shopping = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/products");
-      setProducts(response.data.products || []);
+      const response = await api.get("/api/v1/products");
+      setProducts(response.data || response.products || []);
     } catch (error) {
       console.error("Error fetching products:", error);
       setProducts([]);
@@ -58,19 +58,21 @@ const Shopping = () => {
 
   const fetchCart = async () => {
     try {
-      const response = await api.get("/cart");
-      setCart(response.data.items || []);
+      const response = await api.get("/api/v1/cart");
+      setCart(response.data?.items || response.items || []);
     } catch (error) {
       console.error("Error fetching cart:", error);
+      setCart([]);
     }
   };
 
   const fetchWishlist = async () => {
     try {
-      const response = await api.get("/wishlist");
-      setWishlist(response.data.items || []);
+      const response = await api.get("/api/v1/wishlist");
+      setWishlist(response.data?.items || response.items || []);
     } catch (error) {
       console.error("Error fetching wishlist:", error);
+      setWishlist([]);
     }
   };
 
