@@ -135,6 +135,21 @@ def create_app():
         
         return response
     
+    # ===== GLOBAL OPTIONS HANDLER =====
+    
+    @app.before_request
+    def handle_preflight():
+        """Handle CORS preflight requests globally"""
+        if request.method == "OPTIONS":
+            # Create a response for preflight requests
+            response = jsonify({"message": "OK"})
+            response.headers.add("Access-Control-Allow-Origin", request.headers.get('Origin', '*'))
+            response.headers.add('Access-Control-Allow-Headers', "Content-Type,Authorization,Accept,Origin,X-Requested-With")
+            response.headers.add('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE,OPTIONS")
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
+            response.headers.add('Access-Control-Max-Age', '86400')
+            return response
+
     # Initialize Firebase
     firebase = FirebaseUtils()
     
@@ -1505,21 +1520,6 @@ def create_app():
                             },
                             "trending_topics": [
                                 {"topic": "product quality", "sentiment": "positive", "mentions": 15},
-                                {"topic": "customer service", "sentiment": "neutral", "mentions": 12},
-                                {"topic": "delivery", "sentiment": "negative", "mentions": 8}
-                            ],
-                            "confidence": 0.78
-                        },
-                        "total_feedback": 100,
-                        "generated_at": datetime.now(timezone.utc).isoformat()
-                    }
-                }), 200
-                    
-            except ImportError as import_error:
-                logger.error(f"ML model import error: {str(import_error)}")
-                # Return fallback analysis
-                return jsonify({
-                    "success": True,
                     "data": {
                         "analysis": {
                             "overall_sentiment": "positive",
