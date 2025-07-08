@@ -216,6 +216,32 @@ def create_app(config_class=Config):
                 "message": "Failed to create demo user"
             }), 500
 
+    # CORS debugging endpoint
+    @app.route("/api/v1/cors-debug", methods=["GET", "POST", "OPTIONS"])
+    def cors_debug():
+        """Debug CORS configuration"""
+        from flask import request
+        
+        origin = request.headers.get('Origin', 'No Origin')
+        method = request.method
+        
+        return {
+            "cors_status": "active",
+            "request_origin": origin,
+            "request_method": method,
+            "allowed_origins": app.config.get("CORS_ORIGINS", []),
+            "cors_headers": dict(request.headers),
+            "message": f"CORS debug - Origin: {origin}, Method: {method}"
+        }
+
+    # Global OPTIONS handler for CORS preflight requests
+    @app.route("/api/v1/<path:path>", methods=["OPTIONS"])
+    @app.route("/api/<path:path>", methods=["OPTIONS"])
+    @app.route("/<path:path>", methods=["OPTIONS"])
+    def handle_options(path=None):
+        """Handle CORS preflight requests"""
+        return "", 200
+
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):

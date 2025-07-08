@@ -41,15 +41,20 @@ class BaseConfig:
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
-        "https://retailgenie-1.onrender.com",  # Render frontend  # Another potential frontend URL
+        "https://retailgenie-1.onrender.com",  # Primary frontend URL
+        "https://retailgenie-frontend.onrender.com",  # Alternative frontend URL
     ]
 
     # Additional CORS from environment (comma-separated)
     env_cors = os.environ.get("CORS_ORIGINS", "")
     if env_cors:
-        CORS_ORIGINS.extend(
-            [origin.strip() for origin in env_cors.split(",") if origin.strip()]
-        )
+        additional_origins = [origin.strip() for origin in env_cors.split(",") if origin.strip()]
+        CORS_ORIGINS.extend(additional_origins)
+    
+    # Explicitly add production frontend if not already present
+    production_frontend = "https://retailgenie-1.onrender.com"
+    if production_frontend not in CORS_ORIGINS:
+        CORS_ORIGINS.append(production_frontend)
 
     # Remove duplicates while preserving order
     CORS_ORIGINS = list(dict.fromkeys(CORS_ORIGINS))
