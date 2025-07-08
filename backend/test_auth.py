@@ -12,7 +12,12 @@ from datetime import datetime
 os.environ['FIREBASE_CREDENTIALS_PATH'] = '/workspaces/RetailGenie/backend/retailgenie-production-firebase-adminsdk-fbsvc-f1c87b490f.json'
 
 def test_firebase_connection():
-    """Test Firebase connection"""
+    """
+    Attempts to establish a connection to Firebase using the application's utility class.
+    
+    Returns:
+        An instance of the Firebase utility class if the connection is successful; otherwise, None.
+    """
     try:
         from app.utils.firebase_utils import FirebaseUtils
         firebase = FirebaseUtils()
@@ -23,7 +28,12 @@ def test_firebase_connection():
         return None
 
 def test_auth_imports():
-    """Test authentication related imports"""
+    """
+    Checks if authentication dependencies `bcrypt` and `jwt` can be successfully imported.
+    
+    Returns:
+        bool: True if both libraries are imported successfully, False otherwise.
+    """
     try:
         import bcrypt
         import jwt
@@ -34,7 +44,15 @@ def test_auth_imports():
         return False
 
 def test_user_registration(firebase):
-    """Test user registration functionality"""
+    """
+    Tests user registration by creating and deleting a sample user document in Firebase.
+    
+    Parameters:
+        firebase: An instance of the Firebase utility used to interact with the database.
+    
+    Returns:
+        bool: True if user registration and cleanup succeed; False otherwise.
+    """
     try:
         import bcrypt
         import uuid
@@ -66,7 +84,12 @@ def test_user_registration(firebase):
         return False
 
 def test_jwt_generation():
-    """Test JWT token generation"""
+    """
+    Tests the generation and verification of a JWT token using a test payload and secret.
+    
+    Returns:
+        bool: True if JWT encoding and decoding succeed; False otherwise.
+    """
     try:
         import jwt
         from datetime import timedelta

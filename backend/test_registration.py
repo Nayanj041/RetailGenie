@@ -12,7 +12,11 @@ import time
 import signal
 
 def test_registration():
-    """Test registration endpoint directly"""
+    """
+    Performs an integration test of the registration API endpoint by launching a temporary Flask server and sending test requests.
+    
+    This function dynamically creates and runs a minimal Flask application exposing registration and health endpoints, then verifies the registration endpoint's behavior by sending HTTP requests with test data. It prints the results and ensures the test server is properly terminated after execution.
+    """
     print("🧪 Testing Registration Endpoint...")
     
     # Start a simple Flask app for testing

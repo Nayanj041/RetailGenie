@@ -15,7 +15,12 @@ backend_path = Path('/workspaces/RetailGenie/backend')
 sys.path.insert(0, str(backend_path))
 
 def check_file_structure():
-    """Check if all required files exist"""
+    """
+    Checks for the presence of all required backend and frontend files needed for deployment.
+    
+    Returns:
+        bool: True if all required files are present; False if any are missing.
+    """
     print("📁 CHECKING FILE STRUCTURE")
     print("=" * 50)
     
@@ -64,7 +69,12 @@ def check_file_structure():
     return True
 
 def check_backend_app():
-    """Test backend app creation and endpoints"""
+    """
+    Attempts to create the backend Flask app and verifies the presence and HTTP methods of critical API endpoints.
+    
+    Returns:
+        bool: True if the app is created successfully and all required endpoints with correct methods are present; False otherwise.
+    """
     print("\n🔧 CHECKING BACKEND APPLICATION")
     print("=" * 50)
     
@@ -122,7 +132,12 @@ def check_backend_app():
         return False
 
 def check_registration_endpoint():
-    """Test registration endpoint functionality"""
+    """
+    Tests the backend registration endpoint by submitting a sample registration request and verifying successful user creation and token generation.
+    
+    Returns:
+        bool: True if the registration endpoint responds correctly and returns expected data; False otherwise.
+    """
     print("\n🔐 CHECKING REGISTRATION ENDPOINT")
     print("=" * 50)
     
@@ -177,7 +192,12 @@ def check_registration_endpoint():
         return False
 
 def check_ml_endpoints():
-    """Test ML endpoints"""
+    """
+    Tests the machine learning-related API endpoints of the backend for correct responses.
+    
+    Returns:
+        bool: True if all ML endpoints respond as expected without exceptions; False otherwise.
+    """
     print("\n🤖 CHECKING ML ENDPOINTS")
     print("=" * 50)
     
@@ -228,7 +248,14 @@ def check_ml_endpoints():
         return False
 
 def check_environment_config():
-    """Check environment configuration"""
+    """
+    Checks that required environment configuration files and variables are present for both backend and frontend.
+    
+    Verifies the existence of the backend `.env.example` file and ensures it contains all required environment variable names. Also checks that the frontend `.env` file exists and includes the `REACT_APP_API_URL` variable.
+    
+    Returns:
+        bool: True if all required configuration files and variables are present; False otherwise.
+    """
     print("\n🌍 CHECKING ENVIRONMENT CONFIGURATION")
     print("=" * 50)
     
@@ -279,7 +306,12 @@ def check_environment_config():
     return True
 
 def check_deployment_files():
-    """Check deployment-specific files"""
+    """
+    Verify that deployment-specific files (`Procfile` and `runtime.txt`) exist in the backend directory and are correctly configured.
+    
+    Returns:
+        bool: True if both files are present and valid, otherwise False.
+    """
     print("\n🚀 CHECKING DEPLOYMENT FILES")
     print("=" * 50)
     
@@ -314,7 +346,14 @@ def check_deployment_files():
     return True
 
 def main():
-    """Run all checks"""
+    """
+    Runs all deployment readiness checks and prints a summary of their results.
+    
+    Executes a series of validation functions to verify the RetailGenie project is ready for deployment, including file structure, backend application, API endpoints, environment configuration, and deployment files. Prints a detailed summary table indicating pass/fail status for each check and outputs deployment instructions if all checks pass.
+    
+    Returns:
+        bool: True if all checks pass and the project is ready for deployment; False otherwise.
+    """
     print("🔍 RETAILGENIE DEPLOYMENT READINESS CHECK")
     print("=" * 70)
     

@@ -10,7 +10,11 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 def test_sentiment_analysis():
-    """Test sentiment analysis model"""
+    """
+    Tests the integration and basic functionality of the sentiment analysis model.
+    
+    Performs import, instantiation, model training, single prediction, and batch analysis using the SentimentAnalyzer. Returns True if all steps succeed, or False if any exception occurs.
+    """
     try:
         print("Testing Sentiment Analysis...")
         from ml_models.sentiment_analysis.sentiment_model import SentimentAnalyzer
@@ -40,7 +44,12 @@ def test_sentiment_analysis():
         return False
 
 def test_inventory_forecasting():
-    """Test inventory forecasting model"""
+    """
+    Tests the import and instantiation of the inventory forecasting model.
+    
+    Returns:
+        bool: True if the model is imported and instantiated successfully, False otherwise.
+    """
     try:
         print("\nTesting Inventory Forecasting...")
         from ml_models.inventory_forecasting.forecast_model import InventoryForecastingModel
@@ -55,7 +64,12 @@ def test_inventory_forecasting():
         return False
 
 def test_pricing_engine():
-    """Test pricing optimization model"""
+    """
+    Tests the integration of the dynamic pricing optimization model.
+    
+    Returns:
+        bool: True if the DynamicPricingEngine can be imported and instantiated successfully, False otherwise.
+    """
     try:
         print("\nTesting Pricing Engine...")
         from ml_models.pricing_engine.pricing_model import DynamicPricingEngine
@@ -70,7 +84,12 @@ def test_pricing_engine():
         return False
 
 def main():
-    """Run all ML model tests"""
+    """
+    Runs integration tests for all ML models and prints a summary of their pass/fail status.
+    
+    Returns:
+        bool: True if all model tests pass, False otherwise.
+    """
     print("=== RetailGenie ML Models Integration Test ===\n")
     
     # Test each model

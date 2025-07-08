@@ -17,7 +17,13 @@ os.environ['FIREBASE_CREDENTIALS_PATH'] = '/workspaces/RetailGenie/backend/retai
 from app.utils.firebase_utils import FirebaseUtils
 
 def create_minimal_app():
-    """Create minimal Flask app with authentication"""
+    """
+    Create and configure a minimal Flask application providing authentication endpoints with Firebase integration, JWT token generation, and bcrypt password hashing.
+    
+    The returned app includes routes for user registration, login, health checks, and root API information, as well as error handlers for 404 and 500 responses.
+    Returns:
+        app (Flask): A configured Flask application instance ready to run.
+    """
     app = Flask(__name__)
     
     # Configuration
@@ -34,7 +40,15 @@ def create_minimal_app():
     firebase = FirebaseUtils()
     
     def generate_jwt_token(user_data):
-        """Generate JWT token for user"""
+        """
+        Generate a JWT token containing user ID, email, role, and a 24-hour expiration.
+        
+        Parameters:
+            user_data (dict): Dictionary containing user information. Must include 'id' and 'email'; 'role' is optional.
+        
+        Returns:
+            str: Encoded JWT token as a string.
+        """
         payload = {
             'user_id': user_data.get('id'),
             'email': user_data.get('email'),
@@ -45,6 +59,9 @@ def create_minimal_app():
     
     @app.route("/", methods=["GET"])
     def root():
+        """
+        Return a JSON response with API information, status, version, and available endpoints.
+        """
         return jsonify({
             "message": "RetailGenie Authentication API",
             "version": "1.0.0",
@@ -58,6 +75,9 @@ def create_minimal_app():
     
     @app.route("/api/v1/health", methods=["GET"])
     def health():
+        """
+        Return a JSON response indicating the authentication service health status, Firebase connectivity, and the current UTC timestamp.
+        """
         return jsonify({
             "status": "healthy",
             "message": "Authentication service is running",
@@ -67,7 +87,12 @@ def create_minimal_app():
     
     @app.route("/api/v1/auth/register", methods=["POST"])
     def register():
-        """User registration endpoint"""
+        """
+        Handles retailer user registration by validating input, checking for existing users, hashing the password, creating a new user record in Firebase, and returning a JWT token and user information upon successful registration.
+        
+        Returns:
+            Response: A JSON response indicating success or failure, including user ID, JWT token, user data (excluding password), and a message on success, or an error message on failure.
+        """
         try:
             # Get JSON data
             if not request.is_json:
@@ -140,7 +165,12 @@ def create_minimal_app():
     
     @app.route("/api/v1/auth/login", methods=["POST"])
     def login():
-        """User login endpoint"""
+        """
+        Handles user login by validating credentials, verifying the password, updating the last login timestamp, and returning a JWT token and user information on success.
+        
+        Returns:
+            JSON response with authentication token and user data (excluding password) if credentials are valid, or an error message with appropriate HTTP status code otherwise.
+        """
         try:
             # Get JSON data
             if not request.is_json:
@@ -190,6 +220,12 @@ def create_minimal_app():
     
     @app.errorhandler(404)
     def not_found(error):
+        """
+        Handles 404 errors by returning a JSON response indicating the endpoint was not found and listing available endpoints.
+        
+        Returns:
+            A tuple containing a JSON response and the HTTP 404 status code.
+        """
         return jsonify({
             "error": "Endpoint not found",
             "available_endpoints": ["/", "/api/v1/health", "/api/v1/auth/register", "/api/v1/auth/login"]
@@ -197,6 +233,9 @@ def create_minimal_app():
     
     @app.errorhandler(500)
     def internal_error(error):
+        """
+        Handles internal server errors by returning a standardized JSON error response with HTTP status code 500.
+        """
         return jsonify({"error": "Internal server error"}), 500
     
     return app

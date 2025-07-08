@@ -33,6 +33,14 @@ limiter = Limiter(
 
 
 def create_app():
+    """
+    Create and configure the RetailGenie Flask application with all API endpoints, middleware, utilities, and error handlers.
+    
+    This function initializes the Flask app, sets up rate limiting, Firebase integration, CORS, request/response lifecycle hooks, and registers all API routes for product management, authentication, analytics, AI assistant, recommendations, feedback, admin operations, monitoring, and diagnostics. It also defines utility functions for standardized responses, authentication enforcement, and batch operations, and configures error handlers for common HTTP errors.
+    
+    Returns:
+        app (Flask): The fully configured Flask application instance ready to run.
+    """
     app = Flask(__name__)
 
     # Initialize rate limiter
@@ -1171,7 +1179,15 @@ def create_app():
     @require_auth
     @limiter.limit("60 per hour")
     def analytics_dashboard():
-        """Get analytics dashboard"""
+        """
+        Return a mock analytics dashboard with summary metrics, sales data, top products, user statistics, and the selected period.
+        
+        Parameters:
+        	period (str, optional): The time period for analytics data, provided as a query parameter. Defaults to "week".
+        
+        Returns:
+        	Response: A standardized JSON response containing analytics dashboard data, including revenue, orders, customers, conversion rate, daily revenue, top products, user statistics, the requested period, and a generation timestamp.
+        """
         try:
             period = request.args.get("period", "week")
 
@@ -1233,7 +1249,15 @@ def create_app():
     @require_auth
     @limiter.limit("60 per hour")
     def get_analytics():
-        """Get analytics data"""
+        """
+        Returns detailed analytics data for the store, including revenue, orders, customer metrics, sales trends, top products, category distribution, and customer segments.
+        
+        Parameters:
+            time_range (str, optional): The time range for analytics data, provided as a query parameter. Defaults to "week".
+        
+        Returns:
+            JSON response containing analytics overview, trends, top products, category breakdown, customer segments, the requested time range, and a generation timestamp.
+        """
         try:
             time_range = request.args.get("time_range", "week")
 
@@ -1290,7 +1314,12 @@ def create_app():
     # Feedback Endpoints
     @app.route("/api/feedback/<product_id>", methods=["GET"])
     def get_feedback(product_id):
-        """Get product feedback"""
+        """
+        Retrieve paginated feedback for a specific product, including average rating, total reviews, and rating distribution.
+        
+        Returns:
+            JSON response containing the product's feedback entries, average rating, total number of reviews, rating distribution (1–5 stars), and pagination metadata.
+        """
         try:
             page = int(request.args.get("page", 1))
             limit = min(int(request.args.get("limit", 20)), 100)
@@ -1859,7 +1888,11 @@ def create_app():
     @app.route("/debug/info")
     @require_auth
     def debug_info():
-        """Debug information for troubleshooting (requires authentication)"""
+        """
+        Returns detailed debug information about the Python environment, OS, Flask configuration, and process for troubleshooting purposes.
+        
+        The response includes Python version and path, selected environment variables (excluding those ending with '_KEY'), current working directory, Flask version and configuration (excluding secrets), and process IDs.
+        """
         try:
             import sys
 

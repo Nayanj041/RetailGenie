@@ -84,7 +84,12 @@ logger = logging.getLogger(__name__)
 
 
 def create_app():
-    """Create and configure the Flask application with ALL advanced features"""
+    """
+    Create and configure the Flask application for the RetailGenie backend, enabling all advanced features, controllers, middleware, CORS, error handlers, and machine learning endpoints.
+    
+    Returns:
+        app (Flask): The fully configured Flask application instance.
+    """
     app = Flask(__name__)
     
     # Configuration
@@ -295,7 +300,12 @@ def create_app():
 
     @app.route("/api/v1/routes", methods=["GET"])
     def list_all_routes():
-        """List all available API routes with descriptions"""
+        """
+        Return a comprehensive list of all available API routes grouped by category, including endpoint paths, HTTP methods, and descriptions.
+        
+        Returns:
+            Response: A JSON object containing route details, total endpoint count, API version, status, active controllers, and enabled features.
+        """
         routes = {
             "system": [
                 {"endpoint": "/", "method": "GET", "description": "Root API information"},
@@ -471,7 +481,11 @@ def create_app():
     
     @app.route("/api/v1/auth/register", methods=["POST"])
     def register():
-        """Retailer registration with enhanced validation (retailer-only platform)"""
+        """
+        Handles retailer-only user registration with enhanced validation, requiring business name and enforcing retailer role.
+        
+        Validates input data for required fields, email format, password strength, and uniqueness. Registers the user in the database, hashes the password, and returns a JWT token upon successful registration. Returns appropriate error responses for missing or invalid data, duplicate users, or registration failures.
+        """
         try:
             # Get JSON data directly from request
             if not request.is_json:
@@ -563,7 +577,12 @@ def create_app():
     
     @app.route("/api/v1/auth/login", methods=["POST"])
     def login():
-        """User login endpoint"""
+        """
+        Authenticates a user by verifying email and password credentials and returns a JWT token on successful login.
+        
+        Returns:
+            JSON response containing authentication status, JWT token, user information, and a message on success; otherwise, returns an error message with the appropriate HTTP status code.
+        """
         try:
             data, error_response, status_code = get_json_data()
             if error_response:
@@ -797,7 +816,11 @@ def create_app():
 
     @app.route("/api/v1/orders", methods=["POST"])
     def create_order_advanced():
-        """Create a new order"""
+        """
+        Creates a new order with specified customer and items, calculates the total, and stores the order in the database.
+        
+        Validates the presence of required fields (`customer_id` and `items`) in the request JSON. Calculates the total price based on item prices and quantities, assigns a unique order ID, and sets timestamps. Returns the created order details and order ID on success, or an error message on failure.
+        """
         try:
             data, error_response, status_code = get_json_data()
             if error_response:
@@ -1215,6 +1238,9 @@ def create_app():
 
     @app.errorhandler(500)
     def internal_error(error):
+        """
+        Handles uncaught internal server errors by logging the error and returning a standardized JSON response with a 500 status code.
+        """
         logger.error(f"Internal server error: {str(error)}")
         return jsonify({"error": "Internal server error", "success": False}), 500
 
@@ -1222,7 +1248,14 @@ def create_app():
     
     @app.route("/api/v1/analytics", methods=["GET"])
     def get_analytics():
-        """Get analytics data for the frontend"""
+        """
+        Returns aggregated analytics data for the frontend dashboard, including revenue, orders, customers, conversion rate, sales trends, top products, category distribution, and customer segments.
+        
+        The endpoint attempts to use real data from the database and falls back to mock data if unavailable. The analytics are generated for a specified time range (default: "week").
+        
+        Returns:
+            JSON response containing analytics data and a success flag. On error, returns an error message with a 500 status code.
+        """
         try:
             time_range = request.args.get("time_range", "week")
             
@@ -1290,7 +1323,11 @@ def create_app():
 
     @app.route("/api/v1/ml/sentiment/analysis", methods=["GET"])
     def get_sentiment_analysis():
-        """Get sentiment analysis of customer feedback"""
+        """
+        Performs sentiment analysis on customer feedback using a machine learning model.
+        
+        Attempts to load or train a sentiment analysis model and analyzes recent feedback comments from the database. Returns overall sentiment, sentiment distribution, trending topics, confidence score, and total feedback count. If the model or data is unavailable, returns fallback mock analysis data.
+        """
         try:
             # Import ML model
             import sys
@@ -1402,7 +1439,12 @@ def create_app():
 
     @app.route("/api/v1/ml/inventory/forecast", methods=["GET"])
     def get_inventory_forecast():
-        """Get inventory demand forecasting"""
+        """
+        Provides inventory demand forecasts for each product using an ML model or fallback logic.
+        
+        Returns:
+            Response: A JSON response containing predicted demand, trend, confidence, current stock, and reorder recommendation for each product. Returns fallback predictions if the ML model or inventory data is unavailable.
+        """
         try:
             # Import ML model
             import sys
@@ -1494,7 +1536,14 @@ def create_app():
 
     @app.route("/api/v1/ml/pricing/optimize", methods=["POST"])
     def optimize_pricing():
-        """Get AI-powered pricing recommendations"""
+        """
+        Provides AI-powered pricing optimization for a product, returning recommended optimal price and influencing factors.
+        
+        Expects a JSON payload with a `product_id`. Attempts to use a machine learning model to calculate the optimal price based on product data, market, and demand factors. If the model or product data is unavailable, returns fallback pricing recommendations.
+        
+        Returns:
+            JSON response containing the product ID, current price, optimal price, price change percentage, confidence score, pricing factors, and generation timestamp.
+        """
         try:
             # Get JSON data from request
             if not request.is_json:

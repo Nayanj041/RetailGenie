@@ -15,13 +15,18 @@ import os
 
 class SentimentAnalyzer:
     def __init__(self):
+        """
+        Initialize the SentimentAnalyzer instance, setting up model components and ensuring required NLTK resources are available.
+        """
         self.model = None
         self.vectorizer = None
         self.stemmer = PorterStemmer()
         self.setup_nltk()
         
     def setup_nltk(self):
-        """Download required NLTK data"""
+        """
+        Ensures that required NLTK data packages ('punkt', 'punkt_tab', and 'stopwords') are available, downloading them if missing.
+        """
         try:
             nltk.data.find('tokenizers/punkt')
         except LookupError:
@@ -38,7 +43,12 @@ class SentimentAnalyzer:
             nltk.download('stopwords')
     
     def preprocess_text(self, text):
-        """Clean and preprocess text for analysis"""
+        """
+        Preprocesses input text by lowercasing, removing non-alphabetic characters, tokenizing, removing English stopwords, and applying stemming.
+        
+        Returns:
+            str: The cleaned and preprocessed text as a single string of stemmed tokens, or an empty string if input is not a string.
+        """
         if not isinstance(text, str):
             return ""
             
@@ -58,7 +68,12 @@ class SentimentAnalyzer:
         return ' '.join(tokens)
     
     def create_sample_data(self):
-        """Create sample training data"""
+        """
+        Generate a sample pandas DataFrame containing example text entries labeled with 'positive', 'negative', or 'neutral' sentiment.
+        
+        Returns:
+            DataFrame: A DataFrame with columns 'text' and 'sentiment' for use in training or testing sentiment analysis models.
+        """
         sample_data = [
             ("Great product, love it!", "positive"),
             ("Amazing quality and fast delivery", "positive"),
@@ -89,7 +104,17 @@ class SentimentAnalyzer:
         return pd.DataFrame(sample_data, columns=['text', 'sentiment'])
     
     def train_model(self, data=None):
-        """Train the sentiment analysis model"""
+        """
+        Train the sentiment analysis model using labeled text data.
+        
+        If no data is provided, generates and uses sample data. Preprocesses the text, splits the data into training and test sets with stratification, builds a pipeline with TF-IDF vectorization and a Multinomial Naive Bayes classifier, trains the model, evaluates its accuracy, and prints a classification report.
+        
+        Parameters:
+            data (pandas.DataFrame, optional): DataFrame with 'text' and 'sentiment' columns. If None, sample data is generated.
+        
+        Returns:
+            float: Accuracy score of the trained model on the test set.
+        """
         if data is None:
             data = self.create_sample_data()
         
@@ -126,7 +151,15 @@ class SentimentAnalyzer:
         return accuracy
     
     def predict_sentiment(self, text):
-        """Predict sentiment of a single text"""
+        """
+        Predicts the sentiment of a single input text and returns the predicted label, confidence score, and class probabilities.
+        
+        Parameters:
+            text (str): The input text to analyze.
+        
+        Returns:
+            dict: A dictionary containing the predicted sentiment label ('sentiment'), the confidence score ('confidence'), and a nested dictionary of class probabilities for 'negative', 'neutral', and 'positive'.
+        """
         if self.model is None:
             raise ValueError("Model not trained yet. Call train_model() first.")
         
@@ -148,7 +181,15 @@ class SentimentAnalyzer:
         }
     
     def analyze_feedback_batch(self, feedback_list):
-        """Analyze multiple feedback texts"""
+        """
+        Analyzes a batch of feedback texts, predicting sentiment for each and aggregating overall statistics.
+        
+        Parameters:
+            feedback_list (list of str): List of feedback texts to analyze.
+        
+        Returns:
+            dict: Contains individual prediction results for each text and aggregated statistics, including total feedback count, counts per sentiment, average confidence, and the most common sentiment.
+        """
         results = []
         for text in feedback_list:
             result = self.predict_sentiment(text)
@@ -172,7 +213,12 @@ class SentimentAnalyzer:
         }
     
     def save_model(self, filepath):
-        """Save the trained model"""
+        """
+        Save the trained sentiment analysis model pipeline to the specified file path.
+        
+        Raises:
+            ValueError: If the model has not been trained.
+        """
         if self.model is None:
             raise ValueError("No model to save. Train the model first.")
         
@@ -181,7 +227,12 @@ class SentimentAnalyzer:
         print(f"Model saved to {filepath}")
     
     def load_model(self, filepath):
-        """Load a pre-trained model"""
+        """
+        Load a pre-trained sentiment analysis model from the specified file path, or train and save a new model if the file does not exist.
+        
+        Parameters:
+            filepath (str): Path to the model file to load or save.
+        """
         if os.path.exists(filepath):
             self.model = joblib.load(filepath)
             print(f"Model loaded from {filepath}")

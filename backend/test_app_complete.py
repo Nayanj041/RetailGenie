@@ -11,7 +11,12 @@ import subprocess
 import signal
 
 def test_app_startup():
-    """Test if the app can start without errors"""
+    """
+    Attempts to start the RetailGenie backend app and verifies the presence of machine learning (ML) endpoints.
+    
+    Returns:
+        bool: True if the app starts successfully and at least three ML endpoints are found; False otherwise.
+    """
     print("🧪 Testing RetailGenie Backend App Startup...")
     
     try:
@@ -44,7 +49,11 @@ def test_app_startup():
         return False
 
 def test_import_status():
-    """Test import status of controllers"""
+    """
+    Attempts to import a predefined list of controller modules to verify their availability in the backend.
+    
+    Prints a success message for each controller that is imported successfully, and an error message for any that fail to import.
+    """
     print("\n🧪 Testing Controller Imports...")
     
     controllers_to_test = [
@@ -67,7 +76,11 @@ def test_import_status():
             print(f"❌ {controller} import failed: {e}")
 
 def test_ml_models():
-    """Test ML model imports"""
+    """
+    Tests the importability of key machine learning model classes from their respective modules.
+    
+    Attempts to import each specified ML model class and prints a success message if the import succeeds, or a warning if it fails.
+    """
     print("\n🧪 Testing ML Model Imports...")
     
     sys.path.append('/workspaces/RetailGenie/backend/ml_models')

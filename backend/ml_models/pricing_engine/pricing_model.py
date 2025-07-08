@@ -23,6 +23,9 @@ class DynamicPricingEngine:
     """
     
     def __init__(self):
+        """
+        Initialize the DynamicPricingEngine with machine learning models, feature scaler, and configuration for model persistence.
+        """
         self.demand_model = GradientBoostingRegressor(
             n_estimators=100,
             learning_rate=0.1,
@@ -43,13 +46,12 @@ class DynamicPricingEngine:
     
     def prepare_pricing_features(self, data: pd.DataFrame) -> pd.DataFrame:
         """
-        Prepare features for pricing optimization
+        Engineers and augments features from raw product and market data for use in pricing optimization models.
         
-        Args:
-            data: DataFrame with product and market data
-            
+        The function generates a comprehensive set of features, including price transformations, cost and margin metrics, demand elasticity, sales velocity, competition comparisons, simulated market and customer segmentation indices, inventory and stock-out risk, product category encoding, and time-based attributes. All missing values are filled with zero to ensure model compatibility.
+        
         Returns:
-            DataFrame with engineered features
+            pd.DataFrame: DataFrame containing the engineered features for pricing optimization.
         """
         features = data.copy()
         
@@ -106,7 +108,12 @@ class DynamicPricingEngine:
         return features
     
     def _calculate_price_elasticity(self, data: pd.DataFrame) -> pd.Series:
-        """Calculate price elasticity of demand"""
+        """
+        Calculates the price elasticity of demand for each row in the input DataFrame.
+        
+        Returns:
+            pd.Series: Series representing the ratio of percentage change in sales quantity to percentage change in price for each observation. Returns zeros if required columns are missing.
+        """
         if 'price' not in data.columns or 'sales_quantity' not in data.columns:
             return pd.Series(np.zeros(len(data)))
         
@@ -118,7 +125,12 @@ class DynamicPricingEngine:
         return elasticity.fillna(0)
     
     def _calculate_seasonal_factor(self, data: pd.DataFrame) -> pd.Series:
-        """Calculate seasonal demand factor"""
+        """
+        Calculates a seasonal demand adjustment factor for each row based on the month extracted from the 'date' column, simulating higher demand in winter months. Returns a factor of 1.0 if no date information is available.
+        
+        Returns:
+            pd.Series: Seasonal adjustment factors for each row in the input data.
+        """
         if 'date' in data.columns:
             data['date'] = pd.to_datetime(data['date'])
             month = data['date'].dt.month
@@ -131,13 +143,15 @@ class DynamicPricingEngine:
     
     def train(self, training_data: pd.DataFrame) -> Dict:
         """
-        Train the pricing optimization models
+        Train the demand and profit prediction models using historical pricing and sales data.
         
-        Args:
-            training_data: DataFrame with historical pricing and sales data
-            
+        Prepares engineered features, scales them, fits the demand and profit models, computes training metrics, saves the trained models, and returns model performance statistics.
+        
+        Parameters:
+            training_data (pd.DataFrame): Historical product, pricing, and sales data.
+        
         Returns:
-            Training metrics
+            Dict: Training metrics including mean absolute error, R² scores, and feature importances for the demand model.
         """
         try:
             # Prepare features
@@ -188,14 +202,14 @@ class DynamicPricingEngine:
     
     def optimize_price(self, product_data: Dict, objective: str = 'profit') -> Dict:
         """
-        Optimize price for a single product
+        Optimizes the price of a single product to maximize a specified objective using predictive models.
         
-        Args:
-            product_data: Product information and market data
-            objective: Optimization objective ('profit', 'revenue', 'market_share')
-            
+        Parameters:
+            product_data (Dict): Dictionary containing product and market information.
+            objective (str): The optimization goal, one of 'profit', 'revenue', or 'market_share'. Defaults to 'profit'.
+        
         Returns:
-            Optimal pricing recommendation
+            Dict: A recommendation containing the optimal price, predicted demand, expected revenue and profit, margin percentage, confidence score, recommendation strength, and identified risk factors.
         """
         try:
             if not self.is_trained:
@@ -278,14 +292,16 @@ class DynamicPricingEngine:
     
     def optimize_portfolio_pricing(self, products: List[Dict], objective: str = 'profit') -> Dict:
         """
-        Optimize pricing for a portfolio of products
+        Optimize prices for a portfolio of products to maximize a specified objective.
         
-        Args:
-            products: List of product data dictionaries
-            objective: Optimization objective
-            
+        For each product in the portfolio, generates an individual price recommendation and aggregates the results to provide portfolio-level revenue and profit summaries, improvement percentages, high-impact product identification, and an overall pricing strategy.
+        
+        Parameters:
+            products (List[Dict]): List of product data dictionaries to optimize.
+            objective (str): Optimization objective, such as 'profit', 'revenue', or 'market_share'.
+        
         Returns:
-            Portfolio pricing recommendations
+            Dict: A dictionary containing individual product recommendations, portfolio summary statistics, a list of high-impact products, and a recommended pricing strategy.
         """
         recommendations = []
         total_current_revenue = 0
@@ -326,12 +342,28 @@ class DynamicPricingEngine:
         }
     
     def _predict_current_demand(self, product_data: Dict) -> float:
-        """Predict current demand for baseline calculations"""
+        """
+        Estimate the current demand for a product using its average sales data.
+        
+        Returns:
+            float: The estimated current demand, defaulting to 50 if average sales data is unavailable.
+        """
         # Simplified current demand prediction
         return product_data.get('avg_sales', 50)
     
     def _calculate_confidence(self, results: List[Dict], optimal_result: Dict) -> float:
-        """Calculate confidence score for the optimal price"""
+        """
+        Calculate a confidence score for the optimal price recommendation based on the profit difference between the best and second-best options.
+        
+        The score reflects how much better the optimal price is compared to alternatives, bounded between 0.1 and 1.0.
+        
+        Parameters:
+            results (List[Dict]): List of pricing simulation results, each containing a 'profit' value.
+            optimal_result (Dict): The result dictionary corresponding to the optimal price.
+        
+        Returns:
+            float: Confidence score for the optimal price, where higher values indicate greater distinction from alternatives.
+        """
         # Calculate how much better the optimal result is compared to alternatives
         profits = [r['profit'] for r in results]
         max_profit = max(profits)
@@ -341,7 +373,15 @@ class DynamicPricingEngine:
         return min(max(confidence, 0.1), 1.0)
     
     def _get_recommendation_strength(self, price_change: float) -> str:
-        """Get recommendation strength based on price change"""
+        """
+        Classifies the strength of a pricing recommendation as 'weak', 'moderate', or 'strong' based on the absolute percentage change in price.
+        
+        Parameters:
+            price_change (float): The percentage change in price.
+        
+        Returns:
+            str: The recommendation strength category.
+        """
         abs_change = abs(price_change)
         if abs_change < 5:
             return 'weak'
@@ -351,7 +391,11 @@ class DynamicPricingEngine:
             return 'strong'
     
     def _identify_risk_factors(self, product_data: Dict, optimal_result: Dict) -> List[str]:
-        """Identify potential risk factors"""
+        """
+        Identifies and returns a list of potential risk factors associated with the recommended optimal price for a product.
+        
+        Assesses risks such as large price changes, low profit margins, low inventory levels, and prices set significantly above competitor pricing.
+        """
         risks = []
         
         price_change = optimal_result.get('price_change_percentage', 0)
@@ -372,7 +416,15 @@ class DynamicPricingEngine:
         return risks
     
     def _generate_pricing_strategy(self, recommendations: List[Dict]) -> Dict:
-        """Generate overall pricing strategy recommendations"""
+        """
+        Summarizes portfolio-level pricing recommendations and determines the overall pricing strategy focus.
+        
+        Parameters:
+            recommendations (List[Dict]): List of individual product pricing recommendations, each containing a 'price_change_percentage' key.
+        
+        Returns:
+            Dict: A summary including the number of products recommended for price increases and decreases, the average price change percentage, and the overall strategy focus ('profit_maximization' or 'market_penetration').
+        """
         price_increases = [r for r in recommendations if r['price_change_percentage'] > 5]
         price_decreases = [r for r in recommendations if r['price_change_percentage'] < -5]
         
@@ -386,7 +438,9 @@ class DynamicPricingEngine:
         return strategy
     
     def save_model(self):
-        """Save the trained models and scaler"""
+        """
+        Persist the trained demand and profit models, feature names, and scaler to disk for later use.
+        """
         try:
             model_data = {
                 'demand_model': self.demand_model,
@@ -400,7 +454,9 @@ class DynamicPricingEngine:
             logger.error(f"Error saving models: {str(e)}")
     
     def load_model(self):
-        """Load previously trained models"""
+        """
+        Loads previously trained demand and profit prediction models, feature names, and scaler from disk if available, and updates the training status flag.
+        """
         try:
             if os.path.exists(self.model_path) and os.path.exists(self.scaler_path):
                 model_data = joblib.load(self.model_path)
@@ -418,14 +474,28 @@ class DynamicPricingEngine:
 # Utility functions for integration
 def optimize_product_price(product_data: Dict, objective: str = 'profit') -> Dict:
     """
-    Convenience function to optimize price for a single product
+    Optimize the price of a single product using machine learning-based dynamic pricing.
+    
+    Parameters:
+        product_data (Dict): Dictionary containing product and market information required for price optimization.
+        objective (str): Optimization goal, such as 'profit', 'revenue', or 'market_share'. Defaults to 'profit'.
+    
+    Returns:
+        Dict: A detailed recommendation including the optimal price, predicted demand, revenue, profit, confidence score, and risk factors.
     """
     engine = DynamicPricingEngine()
     return engine.optimize_price(product_data, objective)
 
 def optimize_portfolio_prices(products_data: List[Dict], objective: str = 'profit') -> Dict:
     """
-    Convenience function to optimize prices for multiple products
+    Optimize prices for a portfolio of products based on a specified objective.
+    
+    Parameters:
+        products_data (List[Dict]): List of product data dictionaries to be optimized.
+        objective (str): Optimization goal, such as 'profit', 'revenue', or 'market_share'. Defaults to 'profit'.
+    
+    Returns:
+        Dict: Portfolio-level pricing recommendations and summary statistics.
     """
     engine = DynamicPricingEngine()
     return engine.optimize_portfolio_pricing(products_data, objective)

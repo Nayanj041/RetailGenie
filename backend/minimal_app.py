@@ -15,6 +15,14 @@ from flask_cors import CORS
 sys.path.insert(0, '/workspaces/RetailGenie/backend')
 
 def create_minimal_app():
+    """
+    Create and configure a minimal Flask application for testing retailer registration and login endpoints.
+    
+    The app provides REST API routes for health checks, retailer registration, and login, with CORS enabled for localhost:3000. Registration and login are simulated for testing purposes without persistent storage.
+     
+    Returns:
+        app (Flask): The configured Flask application instance.
+    """
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'test-secret-key'
     app.config['JWT_SECRET'] = 'test-jwt-secret'
@@ -23,7 +31,15 @@ def create_minimal_app():
     CORS(app, origins=['http://localhost:3000'], supports_credentials=True)
     
     def get_json_data():
-        """Helper to get JSON data from request"""
+        """
+        Extracts and validates JSON data from the incoming Flask request.
+        
+        Returns:
+            tuple: (data, error_response, status_code)
+                - data: Parsed JSON data if valid, otherwise None.
+                - error_response: Flask JSON response object if an error occurs, otherwise None.
+                - status_code: HTTP status code for the error, otherwise None.
+        """
         try:
             if not request.is_json:
                 return None, jsonify({"success": False, "error": "Content-Type must be application/json"}), 400
@@ -35,7 +51,15 @@ def create_minimal_app():
             return None, jsonify({"success": False, "error": f"Invalid JSON: {str(e)}"}), 400
     
     def generate_jwt_token(user_data):
-        """Generate JWT token for user"""
+        """
+        Generate a JWT token containing user ID, email, role, and a 24-hour expiration.
+        
+        Parameters:
+            user_data (dict): Dictionary with user information, including at least 'id' and 'email'. The 'role' key is optional and defaults to 'retailer'.
+        
+        Returns:
+            str: Encoded JWT token as a string.
+        """
         payload = {
             'user_id': user_data.get('id'),
             'email': user_data.get('email'),
@@ -46,11 +70,19 @@ def create_minimal_app():
     
     @app.route('/api/v1/health', methods=['GET'])
     def health():
+        """
+        Return a JSON response indicating the backend service is operational.
+        """
         return jsonify({"status": "ok", "message": "RetailGenie Backend is running"})
     
     @app.route('/api/v1/auth/register', methods=['POST'])
     def register():
-        """Retailer registration - business accounts only"""
+        """
+        Handles retailer registration for business accounts by validating input, simulating user creation, and returning a JWT token and user data.
+        
+        Returns:
+        	A Flask JSON response containing success status, user ID, JWT token, user data, and a message on successful registration, or an error message with appropriate HTTP status code on failure.
+        """
         try:
             data, error_response, status_code = get_json_data()
             if error_response:
@@ -110,7 +142,12 @@ def create_minimal_app():
     
     @app.route('/api/v1/auth/login', methods=['POST'])
     def login():
-        """Login endpoint for testing"""
+        """
+        Handles retailer login for testing by validating credentials and returning a mock user object with a JWT token.
+        
+        Returns:
+            Response: JSON response containing a success flag, JWT token, user data, and message on successful login, or an error message on failure.
+        """
         try:
             data, error_response, status_code = get_json_data()
             if error_response:
