@@ -108,6 +108,18 @@ def create_app():
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
          expose_headers=['Content-Type', 'Authorization'])
     
+    # Additional CORS headers for all requests
+    @app.after_request
+    def after_request(response):
+        # Ensure CORS headers are present on all responses
+        origin = request.headers.get('Origin')
+        if origin in cors_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept, Origin, X-Requested-With'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
+    
     # Initialize Firebase
     firebase = FirebaseUtils()
     
@@ -503,25 +515,37 @@ def create_app():
 
     # ===== AUTHENTICATION ENDPOINTS =====
     
-    @app.route("/api/v1/auth/register", methods=["POST"])
+    @app.route("/api/v1/auth/register", methods=["POST", "OPTIONS"])
     def register():
         """Retailer registration with enhanced validation (retailer-only platform)"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
+            
         try:
             # Get JSON data directly from request
             if not request.is_json:
-                return jsonify({"success": False, "error": "Content-Type must be application/json"}), 400
+                return jsonify({"success": False, "message": "Content-Type must be application/json"}), 400
             
             data = request.get_json()
             if not data:
-                return jsonify({"success": False, "error": "No JSON data provided"}), 400
+                return jsonify({"success": False, "message": "No JSON data provided"}), 400
             
             if "auth" in controllers:
                 result = controllers["auth"].register_user(data)
                 if result.get("success"):
                     # Generate JWT token
                     token = generate_jwt_token(result.get("user", {}))
-                    result["token"] = token
-                return jsonify(result), 201 if result.get("success") else 400
+                    return jsonify({
+                        "success": True,
+                        "data": {
+                            "token": token,
+                            "user": result.get("user", {})
+                        },
+                        "message": "User registered successfully"
+                    }), 201
+                else:
+                    return jsonify({"success": False, "message": result.get("error", "Registration failed")}), 400
             else:
                 # Enhanced fallback implementation - Retailer-only registration
                 email = data.get("email")
@@ -531,24 +555,24 @@ def create_app():
                 role = "retailer"  # Force retailer role only
                 
                 if not all([email, password, name]):
-                    return jsonify({"success": False, "error": "Email, password, and name required"}), 400
+                    return jsonify({"success": False, "message": "Email, password, and name required"}), 400
                 
                 # Validate business name for retailers
                 if not business_name:
-                    return jsonify({"success": False, "error": "Business name is required for retailer registration"}), 400
+                    return jsonify({"success": False, "message": "Business name is required for retailer registration"}), 400
                 
                 # Validate email format
                 if "@" not in email:
-                    return jsonify({"success": False, "error": "Invalid email format"}), 400
+                    return jsonify({"success": False, "message": "Invalid email format"}), 400
                 
                 # Validate password strength
                 if len(password) < 6:
-                    return jsonify({"success": False, "error": "Password must be at least 6 characters"}), 400
+                    return jsonify({"success": False, "message": "Password must be at least 6 characters"}), 400
                 
                 # Check if user already exists
                 existing_users = firebase.get_documents("users") or []
                 if any(u.get("email") == email for u in existing_users):
-                    return jsonify({"success": False, "error": "User already exists"}), 400
+                    return jsonify({"success": False, "message": "User already exists"}), 400
                 
                 # Hash password
                 hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -574,10 +598,11 @@ def create_app():
                 
                 return jsonify({
                     "success": True,
-                    "user_id": user_id,
-                    "token": token,
-                    "user": user_for_token,
-                    "message": "Retailer registered successfully"
+                    "data": {
+                        "token": token,
+                        "user": user_for_token
+                    },
+                    "message": "User registered successfully"
                 }), 201
                 
         except Exception as e:
@@ -595,9 +620,13 @@ def create_app():
     
     # ===== ADVANCED ENDPOINTS (INLINE IMPLEMENTATION) =====
     
-    @app.route("/api/v1/auth/login", methods=["POST"])
+    @app.route("/api/v1/auth/login", methods=["POST", "OPTIONS"])
     def login():
         """User login endpoint"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
+            
         try:
             data, error_response, status_code = get_json_data()
             if error_response:
@@ -608,27 +637,35 @@ def create_app():
                 password = data.get("password")
                 
                 if not email or not password:
-                    return jsonify({"success": False, "error": "Email and password required"}), 400
+                    return jsonify({"success": False, "message": "Email and password required"}), 400
                 
                 result = controllers["auth"].login_user(email, password)
                 if result.get("success"):
                     token = generate_jwt_token(result.get("user", {}))
-                    result["token"] = token
-                return jsonify(result), 200 if result.get("success") else 401
+                    return jsonify({
+                        "success": True,
+                        "data": {
+                            "token": token,
+                            "user": result.get("user", {})
+                        },
+                        "message": "Login successful"
+                    }), 200
+                else:
+                    return jsonify({"success": False, "message": result.get("error", "Login failed")}), 401
             else:
                 # Fallback implementation
                 email = data.get("email")
                 password = data.get("password")
                 
                 if not email or not password:
-                    return jsonify({"success": False, "error": "Email and password required"}), 400
+                    return jsonify({"success": False, "message": "Email and password required"}), 400
                 
                 # Find user
                 users = firebase.get_documents("users") or []
                 user = next((u for u in users if u.get("email") == email), None)
                 
                 if not user:
-                    return jsonify({"success": False, "error": "Invalid credentials"}), 401
+                    return jsonify({"success": False, "message": "Invalid credentials"}), 401
                 
                 # Check password
                 if bcrypt.checkpw(password.encode('utf-8'), user.get("password", "").encode('utf-8')):
@@ -643,12 +680,14 @@ def create_app():
                     
                     return jsonify({
                         "success": True,
-                        "token": token,
-                        "user": user_for_token,
+                        "data": {
+                            "token": token,
+                            "user": user_for_token
+                        },
                         "message": "Login successful"
                     }), 200
                 else:
-                    return jsonify({"success": False, "error": "Invalid credentials"}), 401
+                    return jsonify({"success": False, "message": "Invalid credentials"}), 401
                     
         except Exception as e:
             logger.error(f"Login error: {str(e)}")
