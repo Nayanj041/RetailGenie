@@ -72,7 +72,7 @@ FIREBASE_AUTH_URI=https://accounts.google.com/o/oauth2/auth
 FIREBASE_TOKEN_URI=https://oauth2.googleapis.com/token
 
 # Google Gemini Configuration
-GEMINI_API_KEY=AIzaSyBDkko1-8M9a12rgxR_acQVVJQ36mnMXsQ
+GEMINI_API_KEY=
 GEMINI_MODEL=gemini-1.5-flash
 
 # CORS Configuration (update with your domain)
