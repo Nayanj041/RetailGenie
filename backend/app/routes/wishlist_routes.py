@@ -5,11 +5,13 @@ User wishlist management endpoints
 
 from flask import Blueprint, jsonify, request
 from app.middleware.auth_middleware import require_auth
+from app.controllers.wishlist_controller import WishlistController
 import logging
 
 logger = logging.getLogger(__name__)
 
 wishlist_bp = Blueprint('wishlist', __name__)
+wishlist_controller = WishlistController()
 
 @wishlist_bp.route('', methods=['GET'])
 @require_auth

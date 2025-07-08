@@ -5,11 +5,13 @@ Shopping cart management endpoints
 
 from flask import Blueprint, jsonify, request
 from app.middleware.auth_middleware import require_auth
+from app.controllers.cart_controller import CartController
 import logging
 
 logger = logging.getLogger(__name__)
 
 cart_bp = Blueprint('cart', __name__)
+cart_controller = CartController()
 
 @cart_bp.route('', methods=['GET'])
 @require_auth
@@ -19,42 +21,20 @@ def get_cart():
         user = getattr(request, 'current_user', {})
         user_id = user.get('user_id', 'sample_user')
         
-        # Sample cart data for demonstration
-        sample_cart = {
-            "user_id": user_id,
-            "items": [
-                {
-                    "id": "cart_item_1",
-                    "product_id": "prod_001",
-                    "name": "Wireless Bluetooth Headphones",
-                    "price": 79.99,
-                    "quantity": 1,
-                    "image": "https://via.placeholder.com/150",
-                    "added_date": "2025-01-05T10:30:00Z"
-                },
-                {
-                    "id": "cart_item_2", 
-                    "product_id": "prod_002",
-                    "name": "Smart Watch Series 5",
-                    "price": 299.99,
-                    "quantity": 2,
-                    "image": "https://via.placeholder.com/150",
-                    "added_date": "2025-01-06T14:20:00Z"
-                }
-            ],
-            "total_items": 3,
-            "subtotal": 679.97,
-            "tax": 54.40,
-            "total": 734.37
-        }
+        result = cart_controller.get_cart(user_id)
         
-        logger.info(f"Cart retrieved for user: {user_id}")
-        return jsonify({
-            "success": True,
-            "data": sample_cart,
-            "message": "Cart retrieved successfully"
-        }), 200
-        
+        if result["success"]:
+            return jsonify({
+                "success": True,
+                "data": result["cart"],
+                "message": result["message"]
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": result["error"]
+            }), 400
+            
     except Exception as e:
         logger.error(f"Error retrieving cart: {e}")
         return jsonify({
