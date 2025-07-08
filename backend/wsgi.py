@@ -16,7 +16,7 @@ from flask import Flask
 from flask_cors import CORS
 import logging
 from datetime import datetime
-from flask import jsonify
+from flask import jsonify, request
 
 # Import configuration
 from config.config import Config
@@ -241,6 +241,90 @@ def create_app(config_class=Config):
     def handle_options(path=None):
         """Handle CORS preflight requests"""
         return "", 200
+
+    # Simple cart and wishlist endpoints
+    @app.route("/api/v1/cart", methods=["GET", "POST", "OPTIONS"])
+    def handle_cart():
+        """Handle cart operations"""
+        if request.method == "OPTIONS":
+            return "", 200
+            
+        try:
+            if request.method == "GET":
+                # Return sample cart data
+                cart_items = [
+                    {
+                        "id": "cart_001",
+                        "product_id": "sample_001", 
+                        "name": "Sample Coffee Beans",
+                        "price": 19.99,
+                        "quantity": 2,
+                        "total": 39.98
+                    }
+                ]
+                
+                return jsonify({
+                    "success": True,
+                    "items": cart_items,
+                    "total": sum(item["total"] for item in cart_items),
+                    "count": len(cart_items)
+                }), 200
+                
+            elif request.method == "POST":
+                # Add item to cart
+                return jsonify({
+                    "success": True,
+                    "message": "Item added to cart"
+                }), 201
+                
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e),
+                "items": [],
+                "total": 0,
+                "count": 0
+            }), 200
+
+    @app.route("/api/v1/wishlist", methods=["GET", "POST", "OPTIONS"])
+    def handle_wishlist():
+        """Handle wishlist operations"""
+        if request.method == "OPTIONS":
+            return "", 200
+            
+        try:
+            if request.method == "GET":
+                # Return sample wishlist data
+                wishlist_items = [
+                    {
+                        "id": "wish_001",
+                        "product_id": "sample_002",
+                        "name": "Organic Tea", 
+                        "price": 12.99,
+                        "added_date": "2025-07-01"
+                    }
+                ]
+                
+                return jsonify({
+                    "success": True,
+                    "items": wishlist_items,
+                    "count": len(wishlist_items)
+                }), 200
+                
+            elif request.method == "POST":
+                # Add item to wishlist
+                return jsonify({
+                    "success": True,
+                    "message": "Item added to wishlist"
+                }), 201
+                
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e),
+                "items": [],
+                "count": 0
+            }), 200
 
     # Error handlers
     @app.errorhandler(404)

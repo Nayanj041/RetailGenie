@@ -214,3 +214,5 @@ def create_product():
             ),
             500,
         )
+
+
