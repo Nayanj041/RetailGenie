@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import {
   ShoppingCart,
   Search,
@@ -79,8 +80,8 @@ const Shopping = () => {
   const addToCart = async (productId, quantity = 1) => {
     try {
       const token = localStorage.getItem("token");
-      await api.post(
-        "/cart/add",
+      const response = await api.post(
+        "/api/v1/cart/add",
         {
           product_id: productId,
           quantity,
@@ -89,17 +90,24 @@ const Shopping = () => {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      fetchCart();
+      
+      if (response.data?.success || response.success) {
+        toast.success("Product added to cart!");
+        fetchCart(); // Refresh cart
+      } else {
+        toast.error("Failed to add product to cart");
+      }
     } catch (error) {
       console.error("Error adding to cart:", error);
+      toast.error("Error adding product to cart");
     }
   };
 
   const addToWishlist = async (productId) => {
     try {
       const token = localStorage.getItem("token");
-      await api.post(
-        "/wishlist/add",
+      const response = await api.post(
+        "/api/v1/wishlist/add",
         {
           product_id: productId,
         },
@@ -107,9 +115,16 @@ const Shopping = () => {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      fetchWishlist();
+      
+      if (response.data?.success || response.success) {
+        toast.success("Product added to wishlist!");
+        fetchWishlist(); // Refresh wishlist
+      } else {
+        toast.error("Failed to add product to wishlist");
+      }
     } catch (error) {
       console.error("Error adding to wishlist:", error);
+      toast.error("Error adding product to wishlist");
     }
   };
 

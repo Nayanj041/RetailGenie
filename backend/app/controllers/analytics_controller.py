@@ -499,13 +499,30 @@ class AnalyticsController:
             for i in range(7):
                 date = (datetime.now() - timedelta(days=6-i)).strftime("%Y-%m-%d")
                 revenue = 2000 + (i * 100) + (i % 3 * 200)  # Sample data pattern
-                sales_trend.append({"date": date, "revenue": revenue})
+                orders = 25 + (i * 2) + (i % 3 * 5)  # Sample orders data
+                sales_trend.append({"date": date, "revenue": revenue, "orders": orders})
 
             # Get top products (sample data if no real data)
             top_products = [
                 {"name": "Coffee Beans", "sales": 45, "revenue": 899.55},
                 {"name": "Organic Tea", "sales": 32, "revenue": 415.68},
                 {"name": "Artisan Chocolate", "sales": 28, "revenue": 251.72},
+            ]
+
+            # Generate category distribution data
+            category_distribution = [
+                {"name": "Electronics", "value": 5200},
+                {"name": "Clothing", "value": 3800},
+                {"name": "Books", "value": 2100},
+                {"name": "Home", "value": 2900},
+                {"name": "Sports", "value": 1650},
+            ]
+
+            # Generate customer segments data
+            customer_segments = [
+                {"segment": "Premium", "customers": 23, "avg_order_value": 125.50},
+                {"segment": "Regular", "customers": 45, "avg_order_value": 78.30},
+                {"segment": "New", "customers": 21, "avg_order_value": 45.20},
             ]
 
             analytics_data = {
@@ -521,6 +538,8 @@ class AnalyticsController:
                 },
                 "sales_trend": sales_trend,
                 "top_products": top_products,
+                "category_distribution": category_distribution,
+                "customer_segments": customer_segments,
                 "time_range": time_range,
             }
 
