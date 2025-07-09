@@ -24,6 +24,15 @@ const Shopping = () => {
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    description: "",
+    price: "",
+    category: "electronics",
+    stock_quantity: "",
+    image: ""
+  });
 
   // Show different interface based on user type
   const isRetailer = user?.userType === "retailer";
@@ -114,6 +123,61 @@ const Shopping = () => {
     }
   };
 
+  const addNewProduct = async (e) => {
+    if (e) e.preventDefault();
+    
+    try {
+      // Validate required fields
+      if (!newProduct.name || !newProduct.price || !newProduct.description) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+
+      if (parseFloat(newProduct.price) <= 0) {
+        toast.error("Price must be greater than 0");
+        return;
+      }
+
+      const productData = {
+        name: newProduct.name.trim(),
+        description: newProduct.description.trim(),
+        price: parseFloat(newProduct.price),
+        category: newProduct.category,
+        stock_quantity: parseInt(newProduct.stock_quantity) || 0,
+        image: newProduct.image || `https://via.placeholder.com/300x200?text=${encodeURIComponent(newProduct.name)}`
+      };
+
+      const response = await api.post("/api/v1/products", productData);
+      
+      if (response.data?.success || response.success) {
+        toast.success("Product added successfully!");
+        setShowAddProductModal(false);
+        setNewProduct({
+          name: "",
+          description: "",
+          price: "",
+          category: "electronics",
+          stock_quantity: "",
+          image: ""
+        });
+        fetchProducts(); // Refresh products list
+      } else {
+        toast.error("Failed to add product");
+      }
+    } catch (error) {
+      console.error("Error adding product:", error);
+      toast.error(error.response?.data?.message || "Error adding product");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -134,14 +198,29 @@ const Shopping = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {isRetailer ? "Product Catalog" : "Smart Shopping"}
-          </h1>
-          <p className="text-gray-600">
-            {isRetailer
-              ? "Manage and view your product inventory"
-              : "Discover products tailored to your preferences"}
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                {isRetailer ? "Product Catalog" : "Smart Shopping"}
+              </h1>
+              <p className="text-gray-600">
+                {isRetailer
+                  ? "Manage and view your product inventory"
+                  : "Discover products tailored to your preferences"}
+              </p>
+            </div>
+            
+            {/* Add Product Button (Retailers Only) */}
+            {isRetailer && (
+              <button
+                onClick={() => setShowAddProductModal(true)}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-lg"
+              >
+                <Plus className="h-5 w-5" />
+                <span>Add New Product</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -315,6 +394,141 @@ const Shopping = () => {
               Try adjusting your search or filters
             </p>
           </div>
+        )}
+
+        {/* Add Product Modal (Retailer only) */}
+        {isRetailer && (
+          <>
+            {showAddProductModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white rounded-lg shadow-md p-6 max-w-lg w-full">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4">
+                    Add New Product
+                  </h2>
+
+                  {/* New Product Form */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Product Name
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={newProduct.name}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter product name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        name="description"
+                        value={newProduct.description}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter product description"
+                        rows="3"
+                      ></textarea>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Price
+                        </label>
+                        <input
+                          type="number"
+                          name="price"
+                          value={newProduct.price}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter product price"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Category
+                        </label>
+                        <select
+                          name="category"
+                          value={newProduct.category}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          {categories.filter(cat => cat !== "all").map((category) => (
+                            <option key={category} value={category}>
+                              {category.charAt(0).toUpperCase() + category.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Stock Quantity
+                      </label>
+                      <input
+                        type="number"
+                        name="stock_quantity"
+                        value={newProduct.stock_quantity}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter stock quantity"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Image URL
+                      </label>
+                      <input
+                        type="text"
+                        name="image"
+                        value={newProduct.image}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter image URL"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddProductModal(false)}
+                      className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors mr-2"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={addNewProduct}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Add Product
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <button
+                onClick={() => setShowAddProductModal(true)}
+                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Add New Product
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
