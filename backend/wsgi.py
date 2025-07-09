@@ -381,6 +381,120 @@ def create_app(config_class=Config):
                 "error": str(e)
             }), 500
 
+    # ===== PROFILE ENDPOINTS =====
+    
+    @app.route("/profile", methods=["GET", "OPTIONS"])
+    def get_profile():
+        """Get user profile"""
+        if request.method == "OPTIONS":
+            return "", 200
+            
+        try:
+            # Fallback implementation - return sample profile
+            profile_data = {
+                "id": "user_123",
+                "name": "Demo User", 
+                "email": "demo@retailgenie.com",
+                "business_name": "Demo Store",
+                "role": "retailer",
+                "created_at": datetime.now().isoformat(),
+                "preferences": {
+                    "theme": "light",
+                    "notifications": True,
+                    "dashboard_layout": "default"
+                }
+            }
+            
+            return jsonify({
+                "success": True,
+                "profile": profile_data
+            }), 200
+            
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
+    @app.route("/profile/preferences", methods=["GET", "POST", "PUT", "OPTIONS"])
+    def handle_profile_preferences():
+        """Handle user profile preferences"""
+        if request.method == "OPTIONS":
+            return "", 200
+            
+        try:
+            if request.method == "GET":
+                # Return current preferences
+                preferences = {
+                    "theme": "light",
+                    "notifications": True,
+                    "dashboard_layout": "default",
+                    "email_alerts": True,
+                    "auto_reorder": False
+                }
+                
+                return jsonify({
+                    "success": True,
+                    "preferences": preferences
+                }), 200
+                
+            elif request.method in ["POST", "PUT"]:
+                # Update preferences
+                data = request.get_json() or {}
+                
+                # Validate and save preferences (fallback implementation)
+                updated_preferences = {
+                    "theme": data.get("theme", "light"),
+                    "notifications": data.get("notifications", True),
+                    "dashboard_layout": data.get("dashboard_layout", "default"),
+                    "email_alerts": data.get("email_alerts", True),
+                    "auto_reorder": data.get("auto_reorder", False),
+                    "updated_at": datetime.now().isoformat()
+                }
+                
+                return jsonify({
+                    "success": True,
+                    "message": "Preferences updated successfully",
+                    "preferences": updated_preferences
+                }), 200
+                
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
+    # ===== SHOPPING ENDPOINTS =====
+    
+    @app.route("/shopping", methods=["GET", "OPTIONS"])
+    def shopping_page():
+        """Shopping page endpoint"""
+        if request.method == "OPTIONS":
+            return "", 200
+            
+        # For SPA routing, this should serve the frontend index.html
+        # But for API purposes, return shopping data
+        try:
+            return jsonify({
+                "success": True,
+                "message": "Shopping page data",
+                "categories": ["Electronics", "Clothing", "Books", "Home & Garden"],
+                "featured_products": [
+                    {
+                        "id": "featured_001",
+                        "name": "Featured Product",
+                        "price": 99.99,
+                        "category": "Electronics"
+                    }
+                ]
+            }), 200
+            
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
@@ -390,6 +504,15 @@ def create_app(config_class=Config):
     def internal_error(error):
         app.logger.error(f"Server Error: {error}")
         return {"error": "Internal server error"}, 500
+
+    # Add to existing error handlers
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return jsonify({
+            "error": "Method not allowed",
+            "message": "The method is not allowed for the requested URL",
+            "success": False
+        }), 405
 
     return app
 

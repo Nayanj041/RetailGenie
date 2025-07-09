@@ -238,3 +238,102 @@ def get_analytics():
             ),
             200,
         )
+
+
+@analytics_bp.route("/ml-analysis", methods=["GET"])
+def get_ml_product_analysis():
+    """Get ML-powered product analysis"""
+    try:
+        store_id = request.args.get("store_id")
+        
+        ml_analysis = analytics_controller.get_ml_product_analysis(store_id)
+        
+        return jsonify({
+            "success": True,
+            "data": ml_analysis["data"],
+            "message": "ML product analysis completed successfully"
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "message": "Failed to generate ML analysis"
+        }), 500
+
+@analytics_bp.route("/product-insights", methods=["GET"])
+def get_product_insights():
+    """Get AI-powered product insights and recommendations"""
+    try:
+        product_id = request.args.get("product_id")
+        
+        if product_id:
+            # Get insights for specific product
+            ml_analysis = analytics_controller.get_ml_product_analysis()
+            if ml_analysis["success"]:
+                product_data = {}
+                for key in ["demand_forecasting", "sentiment_analysis", "pricing_recommendations"]:
+                    if product_id in ml_analysis["data"].get(key, {}):
+                        product_data[key] = ml_analysis["data"][key][product_id]
+                
+                # Find product insights
+                product_insights = next(
+                    (p for p in ml_analysis["data"].get("product_insights", []) if p["product_id"] == product_id),
+                    None
+                )
+                
+                return jsonify({
+                    "success": True,
+                    "product_id": product_id,
+                    "insights": product_insights,
+                    "detailed_analysis": product_data,
+                    "message": f"Product insights for {product_id}"
+                }), 200
+            else:
+                return jsonify(ml_analysis), 500
+        else:
+            # Get insights for all products
+            ml_analysis = analytics_controller.get_ml_product_analysis()
+            return jsonify(ml_analysis), 200 if ml_analysis["success"] else 500
+            
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "message": "Failed to retrieve product insights"
+        }), 500
+
+@analytics_bp.route("/inventory-alerts", methods=["GET"])
+def get_inventory_alerts():
+    """Get ML-powered inventory alerts"""
+    try:
+        ml_analysis = analytics_controller.get_ml_product_analysis()
+        
+        if ml_analysis["success"]:
+            alerts = ml_analysis["data"].get("inventory_alerts", [])
+            critical_alerts = [a for a in alerts if a.get("alert_level") == "critical"]
+            warning_alerts = [a for a in alerts if a.get("alert_level") == "warning"]
+            
+            return jsonify({
+                "success": True,
+                "alerts": {
+                    "critical": critical_alerts,
+                    "warning": warning_alerts,
+                    "total": len(alerts)
+                },
+                "summary": {
+                    "critical_count": len(critical_alerts),
+                    "warning_count": len(warning_alerts),
+                    "total_alerts": len(alerts)
+                },
+                "message": "Inventory alerts retrieved successfully"
+            }), 200
+        else:
+            return jsonify(ml_analysis), 500
+            
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "message": "Failed to retrieve inventory alerts"
+        }), 500
