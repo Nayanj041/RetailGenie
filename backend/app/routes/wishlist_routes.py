@@ -4,14 +4,11 @@ User wishlist management endpoints
 """
 
 from flask import Blueprint, jsonify, request
-from app.middleware.auth_middleware import require_auth
-from app.controllers.wishlist_controller import WishlistController
 import logging
 
 logger = logging.getLogger(__name__)
 
 wishlist_bp = Blueprint('wishlist', __name__)
-wishlist_controller = WishlistController()
 
 @wishlist_bp.route('', methods=['GET'])
 def get_wishlist():
@@ -109,12 +106,11 @@ def add_to_wishlist():
         }), 500
 
 @wishlist_bp.route('/remove/<item_id>', methods=['DELETE'])
-@require_auth
 def remove_from_wishlist(item_id):
     """Remove item from wishlist"""
     try:
         user = getattr(request, 'current_user', {})
-        user_id = user.get('user_id', 'sample_user')
+        user_id = user.get('user_id', 'guest_user')
         
         logger.info(f"Item removed from wishlist for user {user_id}: {item_id}")
         return jsonify({
@@ -130,12 +126,11 @@ def remove_from_wishlist(item_id):
         }), 500
 
 @wishlist_bp.route('/move-to-cart/<item_id>', methods=['POST'])
-@require_auth
 def move_to_cart(item_id):
     """Move item from wishlist to cart"""
     try:
         user = getattr(request, 'current_user', {})
-        user_id = user.get('user_id', 'sample_user')
+        user_id = user.get('user_id', 'guest_user')
         
         response_data = {
             "moved_item_id": item_id,

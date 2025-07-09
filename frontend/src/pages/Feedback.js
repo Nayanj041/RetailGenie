@@ -117,9 +117,9 @@ const Feedback = () => {
 
   const filteredFeedback = feedback.filter((item) => {
     const matchesSearch =
-      item.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.comment.toLowerCase().includes(searchTerm.toLowerCase());
+      (item.customer_name && item.customer_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.product_name && item.product_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.comment && item.comment.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesRating =
       filterRating === "all" || item.rating === parseInt(filterRating);

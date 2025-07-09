@@ -22,15 +22,39 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
-
+      
+      // Check if response is OK
       if (!response.ok) {
-        throw new Error(
-          data.message || `HTTP error! status: ${response.status}`,
-        );
+        // Try to get error message from response
+        let errorMessage;
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || `HTTP error! status: ${response.status}`;
+          } catch {
+            errorMessage = `HTTP error! status: ${response.status}`;
+          }
+        } else {
+          // Server returned HTML (like 404/405 error page)
+          const text = await response.text();
+          errorMessage = `Server error: ${response.status} - ${text.substring(0, 100)}...`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      return data;
+      // Parse JSON response
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+      } else {
+        // Non-JSON response
+        const text = await response.text();
+        throw new Error(`Expected JSON response but got: ${text.substring(0, 100)}...`);
+      }
+      
     } catch (error) {
       console.error("API request failed:", error);
       throw error;

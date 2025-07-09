@@ -87,6 +87,9 @@ def create_app():
     """Create and configure the Flask application with ALL advanced features"""
     app = Flask(__name__)
     
+    # Make Flask more forgiving with trailing slashes
+    app.url_map.strict_slashes = False
+    
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
@@ -267,15 +270,19 @@ def create_app():
     try:
         from app.routes.cart_routes import cart_bp
         app.register_blueprint(cart_bp, url_prefix="/api/v1/cart")
+        print("✅ Cart blueprint registered at /api/v1/cart")
         logger.info("✅ Cart blueprint registered at /api/v1/cart")
     except Exception as e:
+        print(f"❌ Cart blueprint registration failed: {e}")
         logger.warning(f"❌ Cart blueprint registration failed: {e}")
 
     try:
         from app.routes.wishlist_routes import wishlist_bp
         app.register_blueprint(wishlist_bp, url_prefix="/api/v1/wishlist")
+        print("✅ Wishlist blueprint registered at /api/v1/wishlist")
         logger.info("✅ Wishlist blueprint registered at /api/v1/wishlist")
     except Exception as e:
+        print(f"❌ Wishlist blueprint registration failed: {e}")
         logger.warning(f"❌ Wishlist blueprint registration failed: {e}")
 
     # ===== MIDDLEWARE & UTILITY FUNCTIONS =====
