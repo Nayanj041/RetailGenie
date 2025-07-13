@@ -18,6 +18,7 @@ class ApiService {
     const config = {
       headers: this.getAuthHeaders(),
       ...options,
+      credentials: 'include', 
     };
 
     try {
@@ -184,6 +185,39 @@ class ApiService {
   async initializeDatabase() {
     return this.request("/api/v1/database/init", {
       method: "POST",
+    });
+  }
+  
+  // Customer API Methods
+  async getCustomers() {
+    return this.request('/api/v1/customers', {
+      method: 'GET'
+    });
+  }
+
+  async addCustomer(customerData) {
+    return this.request('/api/v1/customers', {
+      method: 'POST',
+      body: JSON.stringify(customerData)
+    });
+  }
+
+  async updateCustomer(customerId, customerData) {
+    return this.request(`/api/v1/customers/${customerId}`, {
+      method: 'PUT',
+      body: JSON.stringify(customerData)
+    });
+  }
+
+  async deleteCustomer(customerId) {
+    return this.request(`/api/v1/customers/${customerId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getCustomerDetails(customerId) {
+    return this.request(`/api/v1/customers/${customerId}`, {
+      method: 'GET'
     });
   }
 }
