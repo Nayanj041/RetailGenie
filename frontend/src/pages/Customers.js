@@ -32,11 +32,19 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await api.get("/api/v1/customers");
-      setCustomers(response.data);
+      setLoading(true);
+      const response = await api.getCustomers();
+      
+      if (response.success && Array.isArray(response.customers)) {
+        setCustomers(response.customers);
+      } else if (response.success && Array.isArray(response.data)) {
+        setCustomers(response.data);
+      } else {
+        throw new Error('Invalid customer data format');
+      }
     } catch (error) {
       console.error("Error fetching customers:", error);
-      toast.error("Failed to load customers");
+      toast.error(error.message || "Failed to load customers. Please try again.");
       setCustomers([]);
     } finally {
       setLoading(false);
@@ -49,12 +57,16 @@ const Customers = () => {
     }
 
     try {
-      await api.delete(`/customers/${customerId}`);
-      setCustomers(customers.filter((customer) => customer.id !== customerId));
-      toast.success("Customer deleted successfully");
+      const response = await api.deleteCustomer(customerId);
+      if (response.success) {
+        setCustomers(customers.filter((customer) => customer.id !== customerId));
+        toast.success("Customer deleted successfully");
+      } else {
+        throw new Error(response.message || 'Failed to delete customer');
+      }
     } catch (error) {
       console.error("Error deleting customer:", error);
-      toast.error("Failed to delete customer");
+      toast.error(error.message || "Failed to delete customer. Please try again.");
     }
   };
 
