@@ -25,6 +25,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       description: "Overview & Analytics",
     },
     {
+      name: "Customers",
+      href: "/customers",
+      icon: User,
+      description: "Customer Management",
+    },
+    {
       name: "AI Assistant",
       href: "/ai-assistant",
       icon: Bot,
