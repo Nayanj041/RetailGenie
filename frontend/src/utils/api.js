@@ -198,6 +198,9 @@ class ApiService {
   async addCustomer(customerData) {
     return this.request('/api/v1/customers', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(customerData)
     });
   }
