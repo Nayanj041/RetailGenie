@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, User, Mail, Phone, MapPin, CreditCard } from "lucide-react";
+import { useAuth } from "../utils/AuthContext";
 import { api } from "../utils/api";
 
 const AddCustomer = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    if (!user) {
+      toast.error("Please login to add customers");
+      navigate("/login");
+    }
+  }, [user, navigate]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -35,6 +45,11 @@ const AddCustomer = () => {
     setLoading(true);
 
     try {
+      // Check authentication
+      if (!user) {
+        throw new Error('You must be logged in to add customers');
+      }
+
       // Validate required fields
       if (!formData.name || !formData.email) {
         throw new Error('Name and email are required fields');
@@ -50,7 +65,13 @@ const AddCustomer = () => {
       }
     } catch (error) {
       console.error("Error adding customer:", error);
-      toast.error(error.message || "Failed to add customer. Please try again.");
+      if (error.message.includes('Authorization') || error.message.includes('login')) {
+        // Handle authentication errors
+        toast.error("Please login again to continue");
+        navigate("/login");
+      } else {
+        toast.error(error.message || "Failed to add customer. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
