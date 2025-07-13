@@ -35,12 +35,22 @@ const AddCustomer = () => {
     setLoading(true);
 
     try {
-      const response = await api.post("/customers", formData);
-      toast.success("Customer added successfully!");
-      navigate("/customers");
+      // Validate required fields
+      if (!formData.name || !formData.email) {
+        throw new Error('Name and email are required fields');
+      }
+
+      const response = await api.addCustomer(formData);
+      
+      if (response.success) {
+        toast.success("Customer added successfully!");
+        navigate("/customers");
+      } else {
+        throw new Error(response.message || 'Failed to add customer');
+      }
     } catch (error) {
       console.error("Error adding customer:", error);
-      toast.error(error.response?.data?.message || "Failed to add customer");
+      toast.error(error.message || "Failed to add customer. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -65,7 +75,7 @@ const AddCustomer = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8" disabled={loading}>
         {/* Personal Information */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
