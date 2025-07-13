@@ -57,6 +57,10 @@ const AddCustomer = () => {
 
       const response = await api.request('/api/v1/customers', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(formData)
       });
       
