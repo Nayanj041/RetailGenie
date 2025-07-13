@@ -225,7 +225,7 @@ const Landing = () => {
               Start Your Store Now
             </Link>
             <p className="mt-2 text-sm text-gray-500">
-              Free 30-day trial • No credit card required
+              Free 14-day trial • No credit card required
             </p>
           </div>
         </div>
