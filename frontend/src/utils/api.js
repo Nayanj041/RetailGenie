@@ -19,10 +19,15 @@ class ApiService {
   }
 
   async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
+    const url = `${this.baseURL}${endpoint.replace(/\/$/, '')}`; // Remove trailing slash
+    const headers = {
+      ...this.getAuthHeaders(),
+      ...(options.headers || {})
+    };
+    
     const config = {
-      headers: this.getAuthHeaders(),
       ...options,
+      headers,
       credentials: 'include', // Include cookies if any
     };
 
