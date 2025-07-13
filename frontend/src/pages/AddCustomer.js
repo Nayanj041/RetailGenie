@@ -55,9 +55,12 @@ const AddCustomer = () => {
         throw new Error('Name and email are required fields');
       }
 
-      const response = await api.addCustomer(formData);
+      const response = await api.request('/api/v1/customers', {
+        method: 'POST',
+        body: JSON.stringify(formData)
+      });
       
-      if (response.success) {
+      if (response.success || response.id) {
         toast.success("Customer added successfully!");
         navigate("/customers");
       } else {
