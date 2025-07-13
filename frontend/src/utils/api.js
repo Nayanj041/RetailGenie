@@ -7,9 +7,12 @@ class ApiService {
 
   getAuthHeaders() {
     const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn('No authentication token found');
+    }
     return {
       "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
+      "Authorization": token ? `Bearer ${token}` : '',
     };
   }
 
@@ -18,7 +21,7 @@ class ApiService {
     const config = {
       headers: this.getAuthHeaders(),
       ...options,
-      credentials: 'include', 
+      credentials: 'include', // Include cookies if any
     };
 
     try {
@@ -187,7 +190,7 @@ class ApiService {
       method: "POST",
     });
   }
-  
+
   // Customer API Methods
   async getCustomers() {
     return this.request('/api/v1/customers', {
@@ -208,9 +211,6 @@ class ApiService {
   async updateCustomer(customerId, customerData) {
     return this.request(`/api/v1/customers/${customerId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(customerData)
     });
   }
