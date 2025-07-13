@@ -9,10 +9,12 @@ class ApiService {
     const token = localStorage.getItem("token");
     if (!token) {
       console.warn('No authentication token found');
+      throw new Error('Please login to continue');
     }
     return {
       "Content-Type": "application/json",
-      "Authorization": token ? `Bearer ${token}` : '',
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/json"
     };
   }
 
@@ -201,9 +203,6 @@ class ApiService {
   async addCustomer(customerData) {
     return this.request('/api/v1/customers', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(customerData)
     });
   }
