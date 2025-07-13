@@ -34,7 +34,10 @@ const Customers = () => {
     try {
       setLoading(true);
       const response = await api.request('/api/v1/customers', { 
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
       });
       
       if (response.success && Array.isArray(response.customers)) {
