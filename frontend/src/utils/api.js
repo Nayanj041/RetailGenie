@@ -205,6 +205,9 @@ class ApiService {
   async updateCustomer(customerId, customerData) {
     return this.request(`/api/v1/customers/${customerId}`, {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(customerData)
     });
   }
