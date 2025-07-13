@@ -33,17 +33,24 @@ const Customers = () => {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      const response = await api.getCustomers();
+      const response = await api.request('/api/v1/customers', { 
+        method: 'GET'
+      });
       
       if (response.success && Array.isArray(response.customers)) {
         setCustomers(response.customers);
       } else if (response.success && Array.isArray(response.data)) {
         setCustomers(response.data);
+      } else if (Array.isArray(response)) {
+        setCustomers(response);
       } else {
         throw new Error('Invalid customer data format');
       }
     } catch (error) {
       console.error("Error fetching customers:", error);
+      if (error.message.includes('login')) {
+        navigate('/login');
+      }
       toast.error(error.message || "Failed to load customers. Please try again.");
       setCustomers([]);
     } finally {
