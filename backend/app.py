@@ -226,6 +226,13 @@ def create_app():
         logger.warning(f"❌ Analytics blueprint registration failed: {e}")
 
     try:
+        from app.routes.customer_routes import customer_bp
+        app.register_blueprint(customer_bp, url_prefix="/api/v1/customers")
+        logger.info("✅ Customer blueprint registered at /api/v1/customers")
+    except Exception as e:
+        logger.warning(f"❌ Customer blueprint registration failed: {e}")
+
+    try:
         from app.routes.feedback_routes import feedback_bp
         app.register_blueprint(feedback_bp, url_prefix="/api/v1/feedback")
         logger.info("✅ Feedback blueprint registered at /api/v1/feedback")

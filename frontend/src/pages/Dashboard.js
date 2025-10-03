@@ -115,8 +115,8 @@ const Dashboard = () => {
                   {dashboardData?.overview?.total_customers || 0}
                 </p>
               </div>
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <Users className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-indigo-50 rounded-lg">
+                <Users className="h-5 w-5 text-indigo-600" />
               </div>
             </div>
             {dashboardData?.overview?.customer_growth && (
@@ -145,8 +145,8 @@ const Dashboard = () => {
                   {dashboardData?.performance_metrics?.customer_satisfaction || 0}%
                 </p>
               </div>
-              <div className="p-2 bg-green-50 rounded-lg">
-                <Star className="h-5 w-5 text-green-600" />
+              <div className="p-2 bg-amber-50 rounded-lg">
+                <Star className="h-5 w-5 text-amber-600" />
               </div>
             </div>
           </div>
@@ -159,8 +159,8 @@ const Dashboard = () => {
                   {dashboardData?.performance_metrics?.conversion_rate || 0}%
                 </p>
               </div>
-              <div className="p-2 bg-purple-50 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-rose-50 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-rose-600" />
               </div>
             </div>
           </div>
