@@ -137,7 +137,7 @@ const Dashboard = () => {
             )}
           </div>
 
-          <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+          <div className="p-4 bg-gray-100 rounded-lg shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Customer Satisfaction</p>
@@ -151,7 +151,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+          <div className="p-4 bg-gray-100 rounded-lg shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Conversion Rate</p>
