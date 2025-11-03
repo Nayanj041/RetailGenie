@@ -111,7 +111,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Customers</p>
-                <p className="text-xl font-bold">
+                <p className="text-xl text-gray-600">
                   {dashboardData?.overview?.total_customers || 0}
                 </p>
               </div>
@@ -141,7 +141,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Customer Satisfaction</p>
-                <p className="text-xl font-bold">
+                <p className="text-xl text-gray-600">
                   {dashboardData?.performance_metrics?.customer_satisfaction || 0}%
                 </p>
               </div>
@@ -155,7 +155,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Conversion Rate</p>
-                <p className="text-xl font-bold">
+                <p className="text-xl text-gray-600">
                   {dashboardData?.performance_metrics?.conversion_rate || 0}%
                 </p>
               </div>
