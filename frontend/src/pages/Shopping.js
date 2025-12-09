@@ -14,6 +14,7 @@ import {
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../utils/AuthContext";
 import { api } from "../utils/api";
+import { productCatalog } from "../data/productCatalog";
 
 const Shopping = () => {
   const { user } = useAuth();
@@ -57,10 +58,13 @@ const Shopping = () => {
     try {
       setLoading(true);
       const response = await api.get("/api/v1/products");
-      setProducts(response.data || response.products || []);
+      const fetchedProducts = response.data || response.products;
+      // Use fetched products if available, otherwise use the product catalog
+      setProducts(fetchedProducts && fetchedProducts.length > 0 ? fetchedProducts : productCatalog);
     } catch (error) {
       console.error("Error fetching products:", error);
-      setProducts([]);
+      // Use product catalog as fallback when API fails
+      setProducts(productCatalog);
     } finally {
       setLoading(false);
     }
